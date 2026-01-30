@@ -5,7 +5,7 @@ export default function PageHeaderSection() {
     <section className="relative w-full h-[250px]">
       {/* Background Image */}
       <Image
-        src="/assets/labuanbajo01.jpg"
+        src="/assets/desgallery2.jpg"
         alt="Paket Wisata NusaTrip"
         fill
         priority

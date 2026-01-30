@@ -6,7 +6,7 @@ export default function AboutHeaderSection() {
       
       {/* Background Image */}
       <Image
-        src="/assets/labuanbajo01.jpg"
+        src="/assets/nusapenida03.jpg"
         alt="Tentang Kami NusaTrip"
         fill
         priority

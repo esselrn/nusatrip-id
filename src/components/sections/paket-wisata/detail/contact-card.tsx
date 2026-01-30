@@ -4,7 +4,7 @@ export default function ContactCard() {
   return (
     <div className="relative w-full h-[360px] rounded-xl overflow-hidden">
       <Image
-        src="/assets/rajaampat.jpg"
+        src="/assets/nusapenida01.jpg"
         alt="Contact Background"
         fill
         className="object-cover"
