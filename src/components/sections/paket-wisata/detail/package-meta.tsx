@@ -4,7 +4,7 @@ import {
   CarIcon,
   UserGroupIcon,
   LanguageIcon,
-} from "@/components/atoms/icons"
+} from "@/components/atoms/icons/icons"
 import { PACKAGE_META } from "@/constants/package-meta"
 
 export default function PackageMeta() {

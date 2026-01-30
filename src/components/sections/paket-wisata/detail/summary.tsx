@@ -1,9 +1,13 @@
+import { SectionTitle } from "@/components/molecules/section/section-title"
+import { FileText } from "lucide-react"
+
 export default function Summary() {
   return (
     <div className="mb-10">
-      <h3 className="font-semibold text-[#0B2C4D] mb-3">
-        Ringkasan
-      </h3>
+      <SectionTitle
+        icon={<FileText size={18} />}
+        title="Ringkasan"
+      />
 
       <p className="text-gray-600 text-sm leading-relaxed">
         Paket wisata Raja Ampat 4 Hari 3 Malam menawarkan pengalaman menjelajahi
