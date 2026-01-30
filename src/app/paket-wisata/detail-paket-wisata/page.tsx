@@ -4,7 +4,7 @@ import DetailLayout from "@/components/layouts/detail-layout"
 import BookingSidebar from "@/components/sections/paket-wisata/detail/booking-sidebar"
 import PackageInfo from "@/components/sections/paket-wisata/detail/package-info"
 import PackageMeta from "@/components/sections/paket-wisata/detail/package-meta"
-
+import Summary from "@/components/sections/paket-wisata/detail/summary"
 
 export default function DetailPaketWisataPage() {
   return (
@@ -22,6 +22,7 @@ export default function DetailPaketWisataPage() {
         <div>
           <PackageInfo />
           <PackageMeta />
+          <Summary />
         </div>
       </DetailLayout>
     </main>
