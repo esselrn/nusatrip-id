@@ -7,6 +7,7 @@ import PackageMeta from "@/components/sections/paket-wisata/detail/package-meta"
 import Summary from "@/components/sections/paket-wisata/detail/summary"
 import IncludeExcludeSection from "@/components/sections/paket-wisata/detail/include-exclude"
 import Itinerary from "@/components/sections/paket-wisata/detail/itinerary"
+import LocationMap from "@/components/sections/paket-wisata/detail/lokasi-wisata"
 
 export default function DetailPaketWisataPage() {
   return (
@@ -27,6 +28,7 @@ export default function DetailPaketWisataPage() {
           <Summary />
           <IncludeExcludeSection />
           <Itinerary />
+          <LocationMap />
         </div>
       </DetailLayout>
     </main>
