@@ -2,6 +2,7 @@ import PageHeaderSection from "@/components/sections/destinasi/detail/page-heade
 import GallerySection from "@/components/sections/destinasi/detail/gallery"
 import DetailLayout from "@/components/layouts/detail-layout"
 import BookingSidebar from "@/components/sections/destinasi/detail/booking-sidebar"
+import ContactCard from "@/components/sections/destinasi/detail/contact-card"
 
 export default function DetailPaketWisataPage() {
   return (
@@ -19,7 +20,7 @@ export default function DetailPaketWisataPage() {
         sidebar={
           <div className="space-y-6">
             <BookingSidebar />
-            
+            <ContactCard />
           </div>
         }
       >
