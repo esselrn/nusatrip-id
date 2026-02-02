@@ -6,6 +6,9 @@ export default function Summary() {
     <div className="mb-10">
       <SectionTitle icon={<FileText size={18} />} title="Ringkasan" />
 
+      <div className="w-full h-px bg-gray-200 mb-8" />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10"></div>
+
       <p className="text-gray-600 text-sm leading-relaxed">
         Candi Prambanan merupakan kompleks candi Hindu terbesar di Indonesia yang dibangun pada abad ke-9 pada masa Kerajaan
         Mataram Kuno. Destinasi ini terkenal dengan arsitektur megah yang menjulang tinggi, detail relief yang mengisahkan

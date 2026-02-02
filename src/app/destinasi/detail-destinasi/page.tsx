@@ -5,6 +5,7 @@ import BookingSidebar from '@/components/sections/destinasi/detail/booking-sideb
 import ContactCard from '@/components/sections/destinasi/detail/contact-card'
 import Summary from '@/components/sections/destinasi/detail/summary'
 import IncludeExcludeSection from '@/components/sections/destinasi/detail/include-exclude'
+import Itinerary from '@/components/sections/destinasi/detail/itinerary'
 
 export default function DetailPaketWisataPage() {
   return (
@@ -29,6 +30,7 @@ export default function DetailPaketWisataPage() {
         <div>
           <Summary />
           <IncludeExcludeSection />
+          <Itinerary />
         </div>
       </DetailLayout>
     </main>
