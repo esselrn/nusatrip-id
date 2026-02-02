@@ -1,12 +1,6 @@
-import Link from "next/link"
+import Link from 'next/link'
 
-export default function DropdownMenu({
-  label,
-  items,
-}: {
-  label: string
-  items: { href: string; label: string }[]
-}) {
+export default function DropdownMenu({ label, items }: { label: string; items: { href: string; label: string }[] }) {
   return (
     <div className="relative group">
       <button className="flex items-center gap-1 px-3 py-2 hover:text-orange-500">

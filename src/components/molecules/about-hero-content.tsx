@@ -1,5 +1,5 @@
-import SectionSubtitle from "@/components/atoms/section-subtitle"
-import SectionTitle from "@/components/atoms/section-title"
+import SectionSubtitle from '@/components/atoms/section-subtitle'
+import SectionTitle from '@/components/atoms/section-title'
 
 type HeroContentProps = {
   subtitle: string

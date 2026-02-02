@@ -1,9 +1,10 @@
-import PageHeaderSection from "@/components/sections/destinasi/detail/page-header"
-import GallerySection from "@/components/sections/destinasi/detail/gallery"
-import DetailLayout from "@/components/layouts/detail-layout"
-import BookingSidebar from "@/components/sections/destinasi/detail/booking-sidebar"
-import ContactCard from "@/components/sections/destinasi/detail/contact-card"
-import Summary from "@/components/sections/destinasi/detail/summary"
+import PageHeaderSection from '@/components/sections/destinasi/detail/page-header'
+import GallerySection from '@/components/sections/destinasi/detail/gallery'
+import DetailLayout from '@/components/layouts/detail-layout'
+import BookingSidebar from '@/components/sections/destinasi/detail/booking-sidebar'
+import ContactCard from '@/components/sections/destinasi/detail/contact-card'
+import Summary from '@/components/sections/destinasi/detail/summary'
+import IncludeExcludeSection from '@/components/sections/destinasi/detail/include-exclude'
 
 export default function DetailPaketWisataPage() {
   return (
@@ -27,7 +28,7 @@ export default function DetailPaketWisataPage() {
       >
         <div>
           <Summary />
-          
+          <IncludeExcludeSection />
         </div>
       </DetailLayout>
     </main>

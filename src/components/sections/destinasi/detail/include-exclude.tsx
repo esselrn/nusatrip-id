@@ -17,7 +17,7 @@ export default function IncludeExcludeSection() {
           <h4 className="font-semibold text-[#0B2C4D] mb-4">Termasuk</h4>
 
           <ul className="space-y-3">
-            {['Transportasi laut (Speed Boat)', 'Penginapan', 'Makan 3x sehari', 'Tiket masuk wisata'].map((item, i) => (
+            {['Transportasi laut (Speed Boat)', 'Pemandu wisata profesional', 'Tiket masuk kawasan Candi Prambanan', 'Transportasi lokal selama tur', 'Dokumentasi foto'].map((item, i) => (
               <IconListItem key={i} icon={<CheckIcon />} text={item} />
             ))}
           </ul>
@@ -28,7 +28,7 @@ export default function IncludeExcludeSection() {
           <h4 className="font-semibold text-[#0B2C4D] mb-4">Tidak Termasuk</h4>
 
           <ul className="space-y-3">
-            {['Tiket pesawat PP', 'Pengeluaran pribadi', 'Asuransi perjalanan'].map((item, i) => (
+            {['Pengeluaran pribadi', 'Makan siang & makan malam', 'Tiket pertunjukan Ramayana Ballet', 'Tips untuk pemandu & supir'].map((item, i) => (
               <IconListItem key={i} icon={<CloseIcon />} text={item} />
             ))}
           </ul>
