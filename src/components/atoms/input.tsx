@@ -1,13 +1,9 @@
-type InputProps = {
-  placeholder: string
-}
-
-export default function Input({ placeholder }: InputProps) {
+export default function Input({ className = '', ...props }: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
-      type="email"
-      placeholder={placeholder}
-      className="w-full sm:w-[320px] px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#FB8C00]"
+      {...props}
+      className={`w-full block px-4 py-3 border border-gray-300 rounded-lg shadow-sm
+      focus:ring-2 focus:ring-[#FB8C00] outline-none ${className}`}
     />
   )
 }

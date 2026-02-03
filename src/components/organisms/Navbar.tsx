@@ -37,10 +37,9 @@ export default function Navbar() {
           <DropdownMenu
             label="Pages"
             items={[
-              { href: '/pages/guide', label: 'Guide' },
-              { href: '/pages/gallery', label: 'Gallery' },
               { href: '/pages/blog-article', label: 'Blog & Article' },
-              { href: '/pages/single-post', label: 'Single Post' }
+              { href: '/pages/guide', label: 'Guide' },
+              { href: '/pages/gallery', label: 'Gallery' }
             ]}
           />
 
