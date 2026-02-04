@@ -1,12 +1,12 @@
-import PageHeaderSection from '@/components/sections/destinasi/detail/page-header'
-import GallerySection from '@/components/sections/destinasi/detail/gallery'
+import PageHeaderSection from '@/components/organisms/page-header'
+import GallerySection from '@/components/organisms/gallery'
 import DetailLayout from '@/components/layouts/detail-layout'
-import BookingSidebar from '@/components/sections/destinasi/detail/booking-sidebar'
-import ContactCard from '@/components/sections/destinasi/detail/contact-card'
-import Summary from '@/components/sections/destinasi/detail/summary'
-import IncludeExcludeSection from '@/components/sections/destinasi/detail/include-exclude'
-import Itinerary from '@/components/sections/destinasi/detail/itinerary'
-import LocationMap from '@/components/sections/destinasi/detail/lokasi-wisata'
+import BookingSidebar from '@/components/organisms/booking-sidebar'
+import ContactCard from '@/components/molecules/contact-card'
+import Summary from '@/components/molecules/summary'
+import IncludeExcludeSection from '@/components/molecules/include-exclude'
+import Itinerary from '@/components/organisms/itinerary'
+import LocationMap from '@/components/organisms/lokasi-wisata'
 
 export default function DetailDestinasiPage() {
   return (

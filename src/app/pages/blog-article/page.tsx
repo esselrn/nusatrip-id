@@ -1,8 +1,8 @@
-import PageHeaderSection from '@/components/sections/pages/blog-article/page-header'
-import ArticleHeroImage from '@/components/sections/pages/blog-article/article-hero-image'
-import ArticleContent from '@/components/sections/pages/blog-article/article-content'
-import ArticleGallery from '@/components/sections/pages/blog-article/article-gallery'
-import CommentForm from '@/components/sections/pages/blog-article/comment-form'
+import PageHeaderSection from '@/components/organisms/article-header'
+import ArticleHeroImage from '@/components/molecules/article-hero-image'
+import ArticleContent from '@/components/molecules/article-content'
+import ArticleGallery from '@/components/organisms/article-gallery'
+import CommentForm from '@/components/molecules/comment-form'
 
 export default function BlogDetailPage() {
   return (

@@ -1,5 +1,5 @@
-import ContactSection from "@/components/sections/kontak/contact-section"
-import NewsletterSection from "@/components/sections/home/newsletter-section"
+import ContactSection from '@/components/organisms/contact-section'
+import NewsletterSection from '@/components/organisms/newsletter-section'
 
 export default function AboutPage() {
   return (
