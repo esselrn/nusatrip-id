@@ -17,9 +17,9 @@ export default function Homepage() {
   return (
     <>
       <HeroSection />
-      <DestinationSection />
+      <DestinationSection variant="home" />
       <TestimonialSection />
-      <PackageSection />
+      <PackageSection variant="home" />
       <AdventureCTASection />
       <BlogSection />
       <NewsletterSection />
