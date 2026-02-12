@@ -1,18 +1,13 @@
-import { NEWSLETTER } from "@/constants/newsletter"
-import { PaperAirplaneIcon } from "@heroicons/react/24/solid"
+import { NEWSLETTER } from '@/constants/newsletter'
+import { PaperAirplaneIcon } from '@heroicons/react/24/solid'
 
 export default function NewsletterSection() {
   return (
-    <section className="bg-white w-full h-[288px] flex items-center">
+    <section className="bg-white w-full min-h-[288px] flex items-center pb-20 lg:pb-0">
       <div className="max-w-[1440px] mx-auto px-6 w-full flex flex-col lg:flex-row items-center justify-between gap-8">
-
         <div className="max-w-xl">
-          <h3 className="font-montserrat text-2xl font-bold text-[#0B2C4D]">
-            {NEWSLETTER.title}
-          </h3>
-          <p className="mt-2 font-inter text-gray-600">
-            {NEWSLETTER.description}
-          </p>
+          <h3 className="font-montserrat text-2xl font-bold text-[#0B2C4D]">{NEWSLETTER.title}</h3>
+          <p className="mt-2 font-inter text-gray-600">{NEWSLETTER.description}</p>
         </div>
 
         <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
