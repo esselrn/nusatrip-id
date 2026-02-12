@@ -1,11 +1,14 @@
-import Link from "next/link"
+import Link from 'next/link'
 
-export default function NavLink({ href, label }: { href: string; label: string }) {
+type NavLinkProps = {
+  href: string
+  label: string
+  onClick?: () => void
+}
+
+export default function NavLink({ href, label, onClick }: NavLinkProps) {
   return (
-    <Link
-      href={href}
-      className="px-3 py-2 text-sm hover:text-orange-500 transition"
-    >
+    <Link href={href} onClick={onClick} className="hover:text-orange-400 transition">
       {label}
     </Link>
   )
