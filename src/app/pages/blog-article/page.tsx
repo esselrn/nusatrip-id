@@ -10,13 +10,13 @@ export default function BlogDetailPage() {
       <PageHeaderSection />
 
       {/* JARAK SETELAH HEADER */}
-      <div className="pt-[100px]" />
+      <div className="pt-24 sm:pt-[100px]" />
 
       {/* FOTO BESAR */}
       <ArticleHeroImage />
 
-      {/* KONTEN TENGAH (173px) */}
-      <section className="px-[173px] mt-[100px]">
+      {/* KONTEN */}
+      <section className="mt-16 px-4 sm:px-6 lg:px-[173px]">
         <ArticleContent />
         <ArticleGallery />
         <CommentForm />

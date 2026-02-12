@@ -1,8 +1,7 @@
 export default function ArticleContent() {
   return (
-    <article className="max-w-[970px] mx-auto mb-20 text-gray-700 leading-relaxed">
-      {/* Title */}
-      <h2 className="text-2xl font-semibold text-[#0B2C4D] mb-6">Pesona Wisata Nusa Penida</h2>
+    <article className="w-full px-4 sm:px-6 max-w-none sm:max-w-[970px] mx-auto mb-16 text-gray-700 leading-relaxed">
+      <h2 className="text-xl sm:text-2xl font-semibold text-[#0B2C4D] mb-4">Pesona Wisata Nusa Penida</h2>
 
       {/* Intro */}
       <p className="mb-4">
