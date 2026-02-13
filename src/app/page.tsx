@@ -1,3 +1,4 @@
+'use client'
 
 import { useEffect } from 'react'
 import HeroSection from '@/components/organisms/hero-section'
