@@ -1,3 +1,4 @@
+
 import PageHeaderSection from '@/components/organisms/detail-header-paket'
 import GallerySection from '@/components/organisms/gallery-paket'
 import DetailLayout from '@/components/layouts/detail-layout'

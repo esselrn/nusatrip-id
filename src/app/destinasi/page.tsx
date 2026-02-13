@@ -1,4 +1,4 @@
-'use client'
+export const dynamic = 'force-dynamic'
 
 import PageHeaderSection from '@/components/organisms/detail-page-header'
 import DestinationSection from '@/components/organisms/destination-section'
