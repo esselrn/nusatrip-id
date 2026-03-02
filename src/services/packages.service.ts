@@ -1,15 +1,13 @@
-import { supabase } from '@/lib/supabase'
+// src/services/packages.service.ts
 
-export async function getPackages() {
-  const { data, error } = await supabase
-    .from('packages')
-    .select('id, title, image, rating, price, duration, desc')
-    .order('created_at', { ascending: true })
+export type { Package, PackageImage, PackageInclude, PackageItinerary, PackageBookingPayload } from '@/types/packages'
 
-  if (error) {
-    console.error('Supabase packages error:', error)
-    throw error
-  }
-
-  return data ?? []
-}
+export {
+  getPackages,
+  getPackageDetail,
+  getPackageImages,
+  getPackageIncludes,
+  getPackageExcludes,
+  getPackageItineraries,
+  createPackageBooking
+} from '@/restapi/packages/queries'

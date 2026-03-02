@@ -1,14 +1,17 @@
 'use client'
 
 import { useState } from 'react'
-import Logo from '@/components/atoms/Logo'
+import { useRouter } from 'next/navigation'
+import Logo from '@/components/atoms/logo'
 import NavLink from '@/components/molecules/nav-link'
 import DropdownMenu from '@/components/molecules/dropdown-menu'
 import LanguageSwitch from '@/components/molecules/language-switch'
+import { supabase } from '@/lib/supabase'
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
   const [active, setActive] = useState<string | null>(null)
+  const router = useRouter()
 
   const toggle = (key: string) => {
     setActive(active === key ? null : key)
@@ -17,6 +20,43 @@ export default function Navbar() {
   const closeMenu = () => {
     setOpen(false)
     setActive(null)
+  }
+
+  // Fetch ID paket pertama lalu navigate ke detailnya
+  const goToFirstPackage = async () => {
+    const { data } = await supabase.from('packages').select('id').order('created_at', { ascending: true }).limit(1).single()
+
+    if (data?.id) {
+      router.push(`/paket-wisata/${data.id}`)
+    } else {
+      router.push('/paket-wisata')
+    }
+  }
+
+  // Fetch ID destinasi pertama lalu navigate ke detailnya
+  const goToFirstDestination = async () => {
+    const { data } = await supabase
+      .from('destinations')
+      .select('id')
+      .order('created_at', { ascending: true })
+      .limit(1)
+      .single()
+
+    if (data?.id) {
+      router.push(`/destinasi/${data.id}`)
+    } else {
+      router.push('/destinasi')
+    }
+  }
+
+  const handleFirstPackageMobile = async () => {
+    closeMenu()
+    await goToFirstPackage()
+  }
+
+  const handleFirstDestinationMobile = async () => {
+    closeMenu()
+    await goToFirstDestination()
   }
 
   return (
@@ -35,7 +75,7 @@ export default function Navbar() {
               label="Paket Wisata"
               items={[
                 { href: '/paket-wisata', label: 'Paket Wisata' },
-                { href: '/paket-wisata/detail-paket-wisata', label: 'Detail Paket Wisata' }
+                { label: 'Detail Paket Wisata', onClick: goToFirstPackage }
               ]}
             />
 
@@ -43,7 +83,7 @@ export default function Navbar() {
               label="Destinasi"
               items={[
                 { href: '/destinasi', label: 'Destinasi' },
-                { href: '/destinasi/detail-destinasi', label: 'Detail Destinasi' }
+                { label: 'Detail Destinasi', onClick: goToFirstDestination }
               ]}
             />
 
@@ -96,7 +136,9 @@ export default function Navbar() {
               {active === 'paket' && (
                 <div className="pl-4 flex flex-col gap-3 text-white/80">
                   <NavLink href="/paket-wisata" label="Paket Wisata" onClick={closeMenu} />
-                  <NavLink href="/paket-wisata/detail-paket-wisata" label="Detail Paket Wisata" onClick={closeMenu} />
+                  <button onClick={handleFirstPackageMobile} className="text-left hover:text-orange-400 transition-colors">
+                    Detail Paket Wisata
+                  </button>
                 </div>
               )}
             </div>
@@ -114,7 +156,12 @@ export default function Navbar() {
               {active === 'destinasi' && (
                 <div className="pl-4 flex flex-col gap-3 text-white/80">
                   <NavLink href="/destinasi" label="Destinasi" onClick={closeMenu} />
-                  <NavLink href="/destinasi/detail-destinasi" label="Detail Destinasi" onClick={closeMenu} />
+                  <button
+                    onClick={handleFirstDestinationMobile}
+                    className="text-left hover:text-orange-400 transition-colors"
+                  >
+                    Detail Destinasi
+                  </button>
                 </div>
               )}
             </div>

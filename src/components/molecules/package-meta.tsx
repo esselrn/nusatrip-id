@@ -1,37 +1,17 @@
-import InfoItem from "@/components/atoms/InfoItem"
-import {
-  ClockIcon,
-  CarIcon,
-  UserGroupIcon,
-  LanguageIcon,
-} from "@/components/atoms/icons/icons"
-import { PACKAGE_META } from "@/constants/package-meta"
+// src/components/molecules/summary-paket.tsx
+import { SectionTitle } from '@/components/molecules/section/section-title'
+import { FileText } from 'lucide-react'
 
-export default function PackageMeta() {
+type Props = {
+  summary: string
+}
+
+export default function Summary({ summary }: Props) {
   return (
-    <div className="border-y border-gray-200 py-6 mb-10">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <InfoItem
-          icon={<ClockIcon />}
-          label="Durasi"
-          value={PACKAGE_META.duration}
-        />
-        <InfoItem
-          icon={<CarIcon />}
-          label="Tipe Tur"
-          value={PACKAGE_META.type}
-        />
-        <InfoItem
-          icon={<UserGroupIcon />}
-          label="Jumlah Peserta"
-          value={PACKAGE_META.maxPerson}
-        />
-        <InfoItem
-          icon={<LanguageIcon />}
-          label="Bahasa"
-          value={PACKAGE_META.language}
-        />
-      </div>
-    </div>
+    <section className="mb-10">
+      <SectionTitle icon={<FileText size={18} />} title="Ringkasan" />
+      <div className="w-full h-px bg-gray-200 my-6" />
+      <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-line">{summary}</p>
+    </section>
   )
 }

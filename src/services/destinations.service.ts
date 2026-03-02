@@ -1,22 +1,19 @@
-import { supabase } from '@/lib/supabase'
+// src/services/destinations.service.ts
 
-export type Destination = {
-  id: number
-  image: string
-  title: string
-  rating: number
-  description: string
-  price: string
-  is_featured: boolean
-}
+export type {
+  Destination,
+  DestinationImage,
+  DestinationInclude,
+  DestinationItinerary,
+  DestinationBookingPayload
+} from '@/types/destinations'
 
-export async function getDestinations() {
-  const { data, error } = await supabase.from('destinations').select('*').order('created_at', { ascending: true })
-
-  if (error) {
-    console.error('Supabase error:', error)
-    throw error
-  }
-
-  return data as Destination[]
-}
+export {
+  getDestinations,
+  getDestinationDetail,
+  getDestinationImages,
+  getDestinationIncludes,
+  getDestinationExcludes,
+  getDestinationItineraries,
+  createDestinationBooking
+} from '@/restapi/destinasi/queries'

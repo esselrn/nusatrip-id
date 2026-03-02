@@ -3,7 +3,9 @@
 import Link from 'next/link'
 import { useState } from 'react'
 
-export default function DropdownMenu({ label, items }: { label: string; items: { href: string; label: string }[] }) {
+type DropdownItem = { href: string; label: string; onClick?: never } | { href?: never; label: string; onClick: () => void }
+
+export default function DropdownMenu({ label, items }: { label: string; items: DropdownItem[] }) {
   const [open, setOpen] = useState(false)
 
   return (
@@ -23,19 +25,34 @@ export default function DropdownMenu({ label, items }: { label: string; items: {
           ${open ? 'opacity-100 visible' : 'opacity-0 invisible'}
         `}
       >
-        {items.map((item, i) => (
-          <Link
-            key={i}
-            href={item.href}
-            className="
-              block px-4 py-2 text-sm text-slate-700
-              transition
-              hover:text-orange-500
-            "
-          >
-            {item.label}
-          </Link>
-        ))}
+        {items.map((item, i) =>
+          item.onClick ? (
+            <button
+              key={i}
+              onClick={() => {
+                item.onClick()
+                setOpen(false)
+              }}
+              className="
+                w-full text-left block px-4 py-2 text-sm text-slate-700
+                transition hover:text-orange-500
+              "
+            >
+              {item.label}
+            </button>
+          ) : (
+            <Link
+              key={i}
+              href={item.href}
+              className="
+                block px-4 py-2 text-sm text-slate-700
+                transition hover:text-orange-500
+              "
+            >
+              {item.label}
+            </Link>
+          )
+        )}
       </div>
     </div>
   )
