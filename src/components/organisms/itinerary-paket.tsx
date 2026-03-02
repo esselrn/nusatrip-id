@@ -1,42 +1,48 @@
-import { SectionTitle } from "@/components/molecules/section/section-title"
-import { Map } from "lucide-react"
+// src/components/organisms/itinerary-paket.tsx
+'use client'
 
-export default function Itinerary() {
-  const days = [
-    {
-      title: "Hari 1 – Kedatangan & Arborek",
-      detail:
-        "Peserta tiba di Raja Ampat dan dijemput oleh tim lokal. Perjalanan dilanjutkan menuju Desa Arborek untuk menikmati suasana pulau, berinteraksi dengan warga setempat, serta berfoto di dermaga ikonik dengan pemandangan laut yang jernih.",
-    },
-    {
-      title: "Hari 2 – Pianemo & Telaga Bintang",
-      detail:
-        "Kegiatan dimulai dengan perjalanan menuju Pianemo untuk menikmati panorama gugusan pulau karst dari atas bukit. Selanjutnya mengunjungi Telaga Bintang yang terkenal dengan bentuknya yang unik, serta menikmati aktivitas wisata bahari dan fotografi.",
-    },
-    {
-      title: "Hari 3 – Wayag & Pulau Karst",
-      detail:
-        "Eksplorasi kawasan Wayag yang menjadi ikon Raja Ampat dengan pemandangan pulau karst yang spektakuler. Peserta diajak trekking ringan untuk menikmati pemandangan dari ketinggian sebelum kembali ke penginapan dan bersiap untuk kepulangan.",
-    },
-  ]
+import { useState } from 'react'
+import { SectionTitle } from '@/components/molecules/section/section-title'
+import { MapPinned, ChevronDown } from 'lucide-react'
+import type { PackageItinerary } from '@/types/packages'
+
+type Props = {
+  itineraries: PackageItinerary[]
+}
+
+export default function ItinerarySection({ itineraries }: Props) {
+  const [openDay, setOpenDay] = useState<number | null>(null)
+
+  const toggle = (day: number) => {
+    setOpenDay(openDay === day ? null : day)
+  }
 
   return (
-    <div className="mb-10">
-      <SectionTitle icon={<Map size={18} />} title="Rencana Perjalanan" />
+    <section className="mb-12">
+      <SectionTitle icon={<MapPinned size={18} />} title="Itinerary Perjalanan" />
+      <div className="w-full h-px bg-gray-200 my-6" />
 
-      <div className="w-full h-px bg-gray-200 mb-8" />
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10"></div>
-      
       <div className="space-y-3">
-        {days.map((day, i) => (
-          <details key={i} className="border rounded-lg px-5 py-4 shadow-sm cursor-pointer">
-            <summary className="font-medium text-sm text-[#0B2C4D]">{day.title}</summary>
-
-            <p className="mt-3 text-sm text-gray-600 leading-relaxed">{day.detail}</p>
-          </details>
+        {itineraries.map((item) => (
+          <div key={item.id} className="border border-gray-200 rounded-xl overflow-hidden">
+            <button
+              onClick={() => toggle(item.day)}
+              className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-gray-50 transition"
+            >
+              <span className="font-medium text-[#0B2C4D] text-sm">
+                Hari {item.day} – {item.title}
+              </span>
+              <ChevronDown
+                size={18}
+                className={`text-gray-400 transition-transform duration-200 shrink-0 ${openDay === item.day ? 'rotate-180' : ''}`}
+              />
+            </button>
+            {openDay === item.day && item.description && (
+              <div className="px-5 pb-4 text-sm text-gray-600 border-t border-gray-100 pt-3">{item.description}</div>
+            )}
+          </div>
         ))}
       </div>
-    </div>
+    </section>
   )
 }
