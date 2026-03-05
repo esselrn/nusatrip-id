@@ -1,7 +1,7 @@
 import '@/shared/styles/globals.css'
 
 import Navbar from '@/components/organisms/navbar'
-import FooterSection from '@/components/organisms/footer-section'
+import FooterSection from '@/components/organisms/footer'
 
 export const metadata = {
   title: 'NusaTrip',

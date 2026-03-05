@@ -6,10 +6,11 @@ type ButtonProps = {
   size?: 'sm' | 'md' | 'lg'
   variant?: 'primary' | 'outline'
   onClick?: () => void
-  href?: string // ⬅️ TAMBAHAN
+  href?: string
+  disabled?: boolean
 }
 
-export default function Button({ children, size = 'md', variant = 'primary', onClick, href }: ButtonProps) {
+export default function Button({ children, size = 'md', variant = 'primary', onClick, href, disabled }: ButtonProps) {
   const sizeClass = {
     sm: 'px-4 py-2 text-sm',
     md: 'px-6 py-3 text-sm',
@@ -21,9 +22,8 @@ export default function Button({ children, size = 'md', variant = 'primary', onC
     outline: 'border border-orange-500 text-orange-500 hover:bg-orange-50'
   }[variant]
 
-  const className = `inline-flex items-center justify-center rounded-md transition font-medium ${sizeClass} ${variantClass}`
+  const className = `inline-flex items-center justify-center rounded-md transition font-medium ${sizeClass} ${variantClass} disabled:opacity-50 disabled:cursor-not-allowed`
 
-  // 👉 JIKA ADA HREF → JADI LINK (Next.js recommended)
   if (href) {
     return (
       <Link href={href} className={className}>
@@ -32,9 +32,8 @@ export default function Button({ children, size = 'md', variant = 'primary', onC
     )
   }
 
-  // 👉 DEFAULT → BUTTON NORMAL
   return (
-    <button onClick={onClick} className={className}>
+    <button onClick={onClick} disabled={disabled} className={className}>
       {children}
     </button>
   )

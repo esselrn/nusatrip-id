@@ -12,7 +12,6 @@ export default function Navbar() {
   const [open, setOpen] = useState(false)
   const [active, setActive] = useState<string | null>(null)
   const router = useRouter()
-
   const toggle = (key: string) => {
     setActive(active === key ? null : key)
   }
