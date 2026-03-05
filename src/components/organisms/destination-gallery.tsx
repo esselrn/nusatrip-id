@@ -1,32 +1,70 @@
-import Image from "next/image"
-import { DESTINATION_GALLERY } from "@/constants/destination-gallery"
+'use client'
+
+import Image from 'next/image'
+import { useState } from 'react'
+
+const gallery = [
+  { country: 'Indonesia', title: 'Gunung Bromo', image: '/assets/desgallery1.jpg' },
+  { country: 'Indonesia', title: 'Pantai Kelingking', image: '/assets/desgallery2.jpg' },
+  { country: 'Indonesia', title: 'Pura Ulun Danu Beratan', image: '/assets/desgallery3.jpg' },
+  { country: 'Indonesia', title: 'Candi Prambanan', image: '/assets/desgallery4.jpg' },
+  { country: 'Indonesia', title: 'Labuan Bajo', image: '/assets/desgallery5.jpg' }
+]
 
 export default function DestinationGallerySection() {
+  const [active, setActive] = useState<number | null>(null)
+
   return (
     <section className="w-full">
-      <div className="grid grid-cols-5 w-full h-[900px]">
-        {DESTINATION_GALLERY.map((item, i) => (
-          <div key={item.title} className="relative h-full">
-            <Image
-              src={item.image}
-              alt={item.title}
-              fill
-              className="object-cover"
-              priority={i === 0}
-            />
+      <div className="flex w-full h-[600px] md:h-[900px]" onMouseLeave={() => setActive(null)}>
+        {gallery.map((item, i) => {
+          const isActive = active === i
+          const isInactive = active !== null && !isActive
 
-            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-transparent" />
+          return (
+            <div
+              key={item.title}
+              className="relative overflow-hidden cursor-pointer transition-all duration-700 ease-in-out"
+              style={{ flex: isActive ? 5 : isInactive ? 0.4 : 1 }}
+              onMouseEnter={() => setActive(i)}
+              onClick={() => setActive(active === i ? null : i)}
+            >
+              <Image src={item.image} alt={item.title} fill className="object-cover" priority={i === 0} />
 
-            <div className="absolute top-8 left-1/2 -translate-x-1/2 z-10 text-white text-center px-4">
-              <p className="text-xs uppercase tracking-widest opacity-80">
-                {item.country}
-              </p>
-              <h3 className="font-montserrat font-semibold text-lg leading-snug">
-                {item.title}
-              </h3>
+              {/* Overlay */}
+              <div
+                className="absolute inset-0 transition-all duration-700"
+                style={{
+                  background: isActive
+                    ? 'linear-gradient(to top, rgba(11,44,77,0.75) 0%, rgba(11,44,77,0.15) 60%, transparent 100%)'
+                    : 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.1) 70%, transparent 100%)'
+                }}
+              />
+
+              {/* Text — always bottom-right, vertical when collapsed, horizontal when active */}
+              <div className="absolute bottom-0 right-0 z-10 p-4 md:p-6 transition-all duration-700">
+                {isActive ? (
+                  /* EXPANDED: text horizontal bottom */
+                  <div className="text-white transition-all duration-500">
+                    <p className="text-xs uppercase tracking-[0.3em] text-white/60 mb-2">{item.country}</p>
+                    <h3 className="font-montserrat font-bold text-2xl md:text-4xl leading-tight max-w-[280px]">
+                      {item.title}
+                    </h3>
+                  </div>
+                ) : (
+                  /* COLLAPSED: text vertical bottom-right */
+                  <div
+                    className="text-white flex flex-col items-end"
+                    style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
+                  >
+                    <p className="text-xs md:text-sm uppercase tracking-widest text-white/60 mb-1">{item.country}</p>
+                    <h3 className="font-montserrat font-semibold text-base md:text-xl leading-snug">{item.title}</h3>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
     </section>
   )

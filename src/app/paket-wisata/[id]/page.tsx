@@ -1,4 +1,3 @@
-// src/app/paket-wisata/[id]/page.tsx
 import { supabase } from '@/lib/supabase'
 import type { Package, PackageImage, PackageInclude, PackageItinerary } from '@/types/packages'
 import DetailLayout from '@/components/layouts/detail-layout'
@@ -15,12 +14,9 @@ import NewsletterSection from '@/components/organisms/newsletter-section'
 
 export default async function PaketDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-
   const { data: paket } = await supabase.from('packages').select('*').eq('id', id).single()
 
-  if (!paket) {
-    return <div className="text-center py-20">Data tidak ditemukan</div>
-  }
+  if (!paket) return <div className="text-center py-20">Data tidak ditemukan</div>
 
   const [{ data: images }, { data: includes }, { data: excludes }, { data: itineraries }] = await Promise.all([
     supabase.from('package_images').select('*').eq('package_id', id).order('sort_order'),
@@ -32,19 +28,16 @@ export default async function PaketDetailPage({ params }: { params: Promise<{ id
   const sidebar = (
     <div className="flex flex-col gap-6">
       <BookingSidebar packageId={paket.id} pricePerPerson={paket.price_per_person} />
-      <ContactCard />
+      <ContactCard name={paket.name} />
     </div>
   )
 
   return (
     <>
       <PageHeaderSection title={paket.name} location={paket.location} backgroundImage={paket.cover_image_url} />
-
-      {/* GALLERY — full width seperti destinasi */}
       <section className="max-w-[1200px] mx-auto px-6 mt-6 lg:mt-16">
         <GallerySection images={(images ?? []) as PackageImage[]} />
       </section>
-
       <DetailLayout sidebar={sidebar}>
         <PackageHeroSection paket={paket as Package} />
         <Summary summary={paket.summary} />
@@ -55,7 +48,6 @@ export default async function PaketDetailPage({ params }: { params: Promise<{ id
         <ItinerarySection itineraries={(itineraries ?? []) as PackageItinerary[]} />
         <LocationMap fullLocation={paket.full_location} />
       </DetailLayout>
-
       <NewsletterSection />
     </>
   )

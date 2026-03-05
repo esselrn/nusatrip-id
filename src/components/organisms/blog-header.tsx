@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import Button from '@/components/atoms/button'
 
 export default function BlogHeader() {
   return (
@@ -10,12 +10,9 @@ export default function BlogHeader() {
           liburanmu.
         </p>
       </div>
-      <Link
-        href="/pages/blog-article"
-        className="inline-flex items-center gap-2 font-inter font-semibold text-[#FB8C00] hover:underline whitespace-nowrap"
-      >
-        LIHAT SEMUA <span>→</span>
-      </Link>
+      <Button href="/pages/blog-article">
+        LIHAT SEMUA →
+      </Button>
     </div>
   )
 }

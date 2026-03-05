@@ -1,11 +1,10 @@
-// src/app/destinasi/[id]/page.tsx
 'use client'
 
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import type { Destination, DestinationImage, DestinationInclude, DestinationItinerary } from '@/types/destinations'
-import PageHeaderSection from '@/components/organisms/page-header'
+import PageHeaderSection from '@/components/organisms/detail-header-destinasi'
 import GallerySection from '@/components/organisms/gallery'
 import DestinationHeroSection from '@/components/organisms/destination-hero-section'
 import DetailLayout from '@/components/layouts/detail-layout'
@@ -29,7 +28,6 @@ export default function DetailDestinasiPage() {
 
   useEffect(() => {
     if (!destinationId) return
-
     Promise.all([
       supabase.from('destinations').select('*').eq('id', destinationId).single(),
       supabase.from('destination_images').select('*').eq('destination_id', destinationId).order('sort_order'),
@@ -57,35 +55,30 @@ export default function DetailDestinasiPage() {
       .finally(() => setLoading(false))
   }, [destinationId])
 
-  if (loading) {
+  if (loading)
     return (
       <div className="flex justify-center items-center min-h-[400px]">
         <p className="text-gray-500">Memuat detail destinasi...</p>
       </div>
     )
-  }
 
-  if (!destination) {
-    return <p className="text-center mt-20 text-gray-500">Destinasi tidak ditemukan.</p>
-  }
+  if (!destination) return <p className="text-center mt-20 text-gray-500">Destinasi tidak ditemukan.</p>
 
   return (
     <main>
       <PageHeaderSection
         title={destination.name}
-        subtitle={destination.full_location}
+        location={destination.full_location}
         backgroundImage={destination.cover_image_url}
       />
-
       <section className="max-w-[1200px] mx-auto px-6 mt-6 lg:mt-16">
         <GallerySection images={images} />
       </section>
-
       <DetailLayout
         sidebar={
           <div className="space-y-6 mt-4 lg:mt-0">
             <BookingSidebar destinationId={destination.id} pricePerPerson={destination.price_per_person} />
-            <ContactCard />
+            <ContactCard name={destination.name} />
           </div>
         }
       >

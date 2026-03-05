@@ -1,7 +1,5 @@
-// src/components/organisms/destination-card.tsx
 import Image from 'next/image'
 import Rating from '@/components/atoms/rating'
-import Price from '@/components/atoms/price'
 import Button from '@/components/atoms/button'
 import type { Destination } from '@/types/destinations'
 
@@ -16,28 +14,22 @@ export default function DestinationCard({
   rating,
   short_description,
   price_per_person,
-  small = false,
+  small = false
 }: DestinationCardProps) {
   return (
-    <div className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition">
+    <div className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition h-full flex flex-col">
       <div className={`relative w-full ${small ? 'h-[180px]' : 'h-[260px]'}`}>
-        <Image
-          src={thumbnail_url ?? '/assets/placeholder.jpg'}
-          alt={name}
-          fill
-          className="object-cover"
-        />
+        <Image src={thumbnail_url ?? '/assets/placeholder.jpg'} alt={name} fill className="object-cover" />
       </div>
-
-      <div className="p-5">
-        <h3 className="font-montserrat text-lg text-[#0B2C4D] mb-1">{name}</h3>
-
+      <div className="p-5 flex flex-col flex-1">
+        <h3 className="font-montserrat text-xl font-bold text-[#0B2C4D] mb-2">{name}</h3>
         <Rating value={rating ?? 0} />
-
-        <p className="font-inter text-sm text-gray-600 my-4">{short_description}</p>
-
-        <div className="flex items-center justify-between">
-          <Price value={price_per_person} />
+        <p className="font-inter text-sm text-gray-600 my-4 line-clamp-3">{short_description}</p>
+        <div className="flex items-center justify-between mt-auto gap-3">
+          <p className="text-[#0B2C4D] font-bold text-lg">
+            Rp {Number(price_per_person).toLocaleString('id-ID')}{' '}
+            <span className="text-gray-500 text-xs font-normal">/ Orang</span>
+          </p>
           <Button href={`/destinasi/${id}`}>PESAN SEKARANG →</Button>
         </div>
       </div>
