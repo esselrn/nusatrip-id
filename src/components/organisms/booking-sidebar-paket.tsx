@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/auth-context'
-import { CheckCircle, AlertCircle, LogIn } from 'lucide-react'
+import { CheckCircle, AlertCircle, LogIn, ClipboardList, ArrowRight } from 'lucide-react'
 
 type Props = {
   packageId: string
@@ -43,6 +43,7 @@ export default function BookingSidebar({ packageId, pricePerPerson }: Props) {
       const { error: supabaseError } = await supabase.from('package_bookings').insert([
         {
           package_id: packageId,
+          user_id: user!.id,
           full_name: form.full_name,
           phone: form.phone,
           email: form.email,
@@ -106,17 +107,30 @@ export default function BookingSidebar({ packageId, pricePerPerson }: Props) {
             <div>
               <h4 className="text-lg font-bold text-[#0B2C4D] mb-1">Pemesanan Berhasil!</h4>
               <p className="text-sm text-gray-500 max-w-xs mx-auto">
-                Terima kasih {profile?.full_name}! Tim kami akan segera menghubungi Anda untuk konfirmasi lebih lanjut.
+                Terima kasih <span className="font-semibold text-[#0B2C4D]">{profile?.full_name}</span>! Tim kami akan segera
+                menghubungi Anda untuk konfirmasi lebih lanjut.
               </p>
             </div>
-            <button onClick={() => setSuccess(false)} className="text-sm text-orange-500 hover:underline font-medium mt-1">
-              Buat pemesanan baru →
-            </button>
+            <div className="w-full space-y-2 pt-1">
+              <button
+                onClick={() => router.push('/riwayat-pesanan')}
+                className="w-full h-[48px] bg-[#0B2C4D] text-white font-semibold rounded-lg hover:bg-[#0a2440] transition text-sm flex items-center justify-center gap-2"
+              >
+                <ClipboardList size={16} />
+                Lihat Riwayat Pesanan
+              </button>
+              <button
+                onClick={() => setSuccess(false)}
+                className="w-full h-[48px] border border-gray-200 text-gray-500 font-medium rounded-lg hover:bg-gray-50 transition text-sm flex items-center justify-center gap-2"
+              >
+                <ArrowRight size={15} />
+                Pesan Paket Lainnya
+              </button>
+            </div>
           </div>
         ) : (
           /* FORM */
           <>
-            {/* Info user yang sedang login */}
             <div className="flex items-center gap-2.5 px-4 py-3 bg-blue-50 rounded-lg border border-blue-100">
               <div className="w-8 h-8 rounded-full bg-[#FB8C00] flex items-center justify-center text-xs font-bold text-white shrink-0">
                 {(profile?.full_name || profile?.email || 'U')[0].toUpperCase()}

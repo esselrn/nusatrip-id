@@ -8,7 +8,7 @@ import NavLink from '@/components/molecules/nav-link'
 import DropdownMenu from '@/components/molecules/dropdown-menu'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/auth-context'
-import { LogOut, ChevronDown } from 'lucide-react'
+import { LogOut, ChevronDown, ClipboardList } from 'lucide-react'
 import LogoutToast from '@/components/organisms/logout-toast'
 
 export default function Navbar() {
@@ -16,6 +16,7 @@ export default function Navbar() {
   const [active, setActive] = useState<string | null>(null)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [showToast, setShowToast] = useState(false)
+  const [bookingCount, setBookingCount] = useState(0)
   const userMenuRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
   const { profile, user } = useAuth()
@@ -26,7 +27,6 @@ export default function Navbar() {
     setActive(null)
   }
 
-  // Tutup user menu saat klik di luar
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
       if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) setUserMenuOpen(false)
@@ -34,6 +34,22 @@ export default function Navbar() {
     document.addEventListener('mousedown', handleClick)
     return () => document.removeEventListener('mousedown', handleClick)
   }, [])
+
+  // Fetch booking count saat user login
+  useEffect(() => {
+    if (!user) return
+    const fetchCount = async () => {
+      const [{ count: c1 }, { count: c2 }] = await Promise.all([
+        supabase.from('package_bookings').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
+        supabase.from('destination_bookings').select('id', { count: 'exact', head: true }).eq('user_id', user.id)
+      ])
+      setBookingCount((c1 ?? 0) + (c2 ?? 0))
+    }
+    fetchCount()
+    return () => {
+      setBookingCount(0)
+    }
+  }, [user])
 
   const goToFirstPackage = async () => {
     const { data } = await supabase.from('packages').select('id').order('created_at', { ascending: true }).limit(1).single()
@@ -92,14 +108,22 @@ export default function Navbar() {
             {/* AUTH */}
             <div className="ml-4 pl-4 border-l border-white/15">
               {user && profile ? (
-                /* LOGGED IN */
                 <div className="relative" ref={userMenuRef}>
                   <button
                     onClick={() => setUserMenuOpen((o) => !o)}
                     className="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-full transition"
                   >
-                    <div className="w-7 h-7 rounded-full bg-[#FB8C00] flex items-center justify-center text-xs font-bold shrink-0">
-                      {initials}
+                    <div className="relative">
+                      <div className="w-7 h-7 rounded-full bg-[#FB8C00] flex items-center justify-center text-xs font-bold shrink-0">
+                        {initials}
+                      </div>
+                      {bookingCount > 0 && (
+                        <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-green-400 rounded-full border border-[#0B2C4D] flex items-center justify-center">
+                          <span className="text-[8px] font-bold text-white leading-none">
+                            {bookingCount > 9 ? '9+' : bookingCount}
+                          </span>
+                        </span>
+                      )}
                     </div>
                     <span className="max-w-[100px] truncate text-sm font-medium">{displayName}</span>
                     <ChevronDown
@@ -108,10 +132,9 @@ export default function Navbar() {
                     />
                   </button>
 
-                  {/* Dropdown */}
                   {userMenuOpen && (
                     <div
-                      className="absolute right-0 top-full mt-2 w-52 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden text-gray-700 z-50"
+                      className="absolute right-0 top-full mt-2 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden text-gray-700 z-50"
                       style={{ animation: 'fadeUp 0.15s ease forwards' }}
                     >
                       {/* User info */}
@@ -126,6 +149,24 @@ export default function Navbar() {
                           </div>
                         </div>
                       </div>
+
+                      {/* Riwayat Pesanan */}
+                      <Link
+                        href="/riwayat-pesanan"
+                        onClick={() => setUserMenuOpen(false)}
+                        className="flex items-center justify-between px-4 py-3 text-sm hover:bg-orange-50 hover:text-[#FB8C00] transition border-b border-gray-100 group"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <ClipboardList size={15} className="text-[#0B2C4D] group-hover:text-[#FB8C00]" />
+                          <span>Riwayat Pesanan</span>
+                        </div>
+                        {bookingCount > 0 && (
+                          <span className="bg-[#FB8C00] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                            {bookingCount}
+                          </span>
+                        )}
+                      </Link>
+
                       {/* Logout */}
                       <button
                         onClick={handleSignOut}
@@ -138,7 +179,6 @@ export default function Navbar() {
                   )}
                 </div>
               ) : (
-                /* NOT LOGGED IN */
                 <div className="flex items-center gap-2">
                   <Link
                     href="/auth/login"
@@ -178,16 +218,21 @@ export default function Navbar() {
         className={`fixed inset-0 z-20 transition-all duration-300 ${open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
       >
         <div className="absolute inset-0 bg-[#061E36]/95 backdrop-blur-md" onClick={closeMenu} />
-
         <div
           className={`absolute top-[64px] left-0 right-0 bottom-0 overflow-y-auto transition-transform duration-300 ${open ? 'translate-y-0' : '-translate-y-4'}`}
         >
           <div className="px-6 py-6 space-y-1 text-sm font-inter">
-            {/* User info mobile (jika login) */}
             {user && profile && (
               <div className="flex items-center gap-3 px-4 py-4 mb-3 bg-white/5 rounded-2xl border border-white/10">
-                <div className="w-10 h-10 rounded-full bg-[#FB8C00] flex items-center justify-center font-bold text-sm shrink-0">
-                  {initials}
+                <div className="relative">
+                  <div className="w-10 h-10 rounded-full bg-[#FB8C00] flex items-center justify-center font-bold text-sm shrink-0">
+                    {initials}
+                  </div>
+                  {bookingCount > 0 && (
+                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full border border-[#061E36] flex items-center justify-center">
+                      <span className="text-[8px] font-bold text-white">{bookingCount > 9 ? '9+' : bookingCount}</span>
+                    </span>
+                  )}
                 </div>
                 <div className="overflow-hidden">
                   <p className="font-semibold text-white truncate">{displayName}</p>
@@ -196,7 +241,6 @@ export default function Navbar() {
               </div>
             )}
 
-            {/* Nav links */}
             {[
               { label: 'Beranda', href: '/' },
               { label: 'Tentang Kami', href: '/about' },
@@ -303,14 +347,30 @@ export default function Navbar() {
             </div>
 
             {/* AUTH mobile */}
-            <div className="pt-4 mt-2 border-t border-white/10">
+            <div className="pt-4 mt-2 border-t border-white/10 space-y-2">
               {user && profile ? (
-                <button
-                  onClick={handleSignOut}
-                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-red-400/30 text-red-400 hover:bg-red-500/10 transition text-sm font-semibold"
-                >
-                  <LogOut size={15} /> Keluar
-                </button>
+                <>
+                  <Link
+                    href="/riwayat-pesanan"
+                    onClick={closeMenu}
+                    className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-white/10 text-white hover:bg-white/15 transition text-sm font-semibold"
+                  >
+                    <div className="flex items-center gap-2">
+                      <ClipboardList size={15} /> Riwayat Pesanan
+                    </div>
+                    {bookingCount > 0 && (
+                      <span className="bg-[#FB8C00] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                        {bookingCount}
+                      </span>
+                    )}
+                  </Link>
+                  <button
+                    onClick={handleSignOut}
+                    className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-red-400/30 text-red-400 hover:bg-red-500/10 transition text-sm font-semibold"
+                  >
+                    <LogOut size={15} /> Keluar
+                  </button>
+                </>
               ) : (
                 <div className="grid grid-cols-2 gap-3">
                   <Link
