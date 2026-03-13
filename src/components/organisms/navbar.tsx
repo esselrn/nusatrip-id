@@ -8,7 +8,7 @@ import NavLink from '@/components/molecules/nav-link'
 import DropdownMenu from '@/components/molecules/dropdown-menu'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/auth-context'
-import { LogOut, ChevronDown, ClipboardList } from 'lucide-react'
+import { LogOut, ChevronDown, ClipboardList, LayoutDashboard } from 'lucide-react'
 import LogoutToast from '@/components/organisms/logout-toast'
 
 export default function Navbar() {
@@ -35,9 +35,9 @@ export default function Navbar() {
     return () => document.removeEventListener('mousedown', handleClick)
   }, [])
 
-  // Fetch booking count saat user login
+  // Fetch booking count saat user login (hanya untuk user biasa)
   useEffect(() => {
-    if (!user) return
+    if (!user || profile?.role === 'admin') return
     const fetchCount = async () => {
       const [{ count: c1 }, { count: c2 }] = await Promise.all([
         supabase.from('package_bookings').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
@@ -49,7 +49,7 @@ export default function Navbar() {
     return () => {
       setBookingCount(0)
     }
-  }, [user])
+  }, [user, profile?.role])
 
   const goToFirstPackage = async () => {
     const { data } = await supabase.from('packages').select('id').order('created_at', { ascending: true }).limit(1).single()
@@ -150,22 +150,35 @@ export default function Navbar() {
                         </div>
                       </div>
 
-                      {/* Riwayat Pesanan */}
-                      <Link
-                        href="/riwayat-pesanan"
-                        onClick={() => setUserMenuOpen(false)}
-                        className="flex items-center justify-between px-4 py-3 text-sm hover:bg-orange-50 hover:text-[#FB8C00] transition border-b border-gray-100 group"
-                      >
-                        <div className="flex items-center gap-2.5">
-                          <ClipboardList size={15} className="text-[#0B2C4D] group-hover:text-[#FB8C00]" />
-                          <span>Riwayat Pesanan</span>
-                        </div>
-                        {bookingCount > 0 && (
-                          <span className="bg-[#FB8C00] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
-                            {bookingCount}
-                          </span>
-                        )}
-                      </Link>
+                      {/* Riwayat Pesanan — hanya untuk user biasa */}
+                      {profile?.role !== 'admin' && (
+                        <Link
+                          href="/riwayat-pesanan"
+                          onClick={() => setUserMenuOpen(false)}
+                          className="flex items-center justify-between px-4 py-3 text-sm hover:bg-orange-50 hover:text-[#FB8C00] transition border-b border-gray-100 group"
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <ClipboardList size={15} className="text-[#0B2C4D] group-hover:text-[#FB8C00]" />
+                            <span>Riwayat Pesanan</span>
+                          </div>
+                          {bookingCount > 0 && (
+                            <span className="bg-[#FB8C00] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                              {bookingCount}
+                            </span>
+                          )}
+                        </Link>
+                      )}
+                      {/* Admin Dashboard link */}
+                      {profile?.role === 'admin' && (
+                        <Link
+                          href="/admin"
+                          onClick={() => setUserMenuOpen(false)}
+                          className="flex items-center gap-2.5 px-4 py-3 text-sm hover:bg-purple-50 hover:text-purple-600 transition border-b border-gray-100 group"
+                        >
+                          <LayoutDashboard size={15} className="text-[#0B2C4D] group-hover:text-purple-600" />
+                          <span>Dashboard Admin</span>
+                        </Link>
+                      )}
 
                       {/* Logout */}
                       <button
@@ -350,20 +363,31 @@ export default function Navbar() {
             <div className="pt-4 mt-2 border-t border-white/10 space-y-2">
               {user && profile ? (
                 <>
-                  <Link
-                    href="/riwayat-pesanan"
-                    onClick={closeMenu}
-                    className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-white/10 text-white hover:bg-white/15 transition text-sm font-semibold"
-                  >
-                    <div className="flex items-center gap-2">
-                      <ClipboardList size={15} /> Riwayat Pesanan
-                    </div>
-                    {bookingCount > 0 && (
-                      <span className="bg-[#FB8C00] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
-                        {bookingCount}
-                      </span>
-                    )}
-                  </Link>
+                  {profile?.role !== 'admin' && (
+                    <Link
+                      href="/riwayat-pesanan"
+                      onClick={closeMenu}
+                      className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-white/10 text-white hover:bg-white/15 transition text-sm font-semibold"
+                    >
+                      <div className="flex items-center gap-2">
+                        <ClipboardList size={15} /> Riwayat Pesanan
+                      </div>
+                      {bookingCount > 0 && (
+                        <span className="bg-[#FB8C00] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                          {bookingCount}
+                        </span>
+                      )}
+                    </Link>
+                  )}
+                  {profile?.role === 'admin' && (
+                    <Link
+                      href="/admin"
+                      onClick={closeMenu}
+                      className="w-full flex items-center gap-2 px-4 py-3 rounded-xl bg-purple-500/20 text-purple-200 hover:bg-purple-500/30 transition text-sm font-semibold"
+                    >
+                      <LayoutDashboard size={15} /> Dashboard Admin
+                    </Link>
+                  )}
                   <button
                     onClick={handleSignOut}
                     className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-red-400/30 text-red-400 hover:bg-red-500/10 transition text-sm font-semibold"

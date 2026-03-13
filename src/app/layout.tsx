@@ -1,9 +1,6 @@
 import '@/shared/styles/globals.css'
-
-import Navbar from '@/components/organisms/navbar'
-import FooterSection from '@/components/organisms/footer'
-import NusaAIChat from '@/components/organisms/nusa-ai-chat'
 import { AuthProvider } from '@/contexts/auth-context'
+import ConditionalLayout from '@/components/organisms/conditional-layout'
 
 export const metadata = {
   title: 'NusaTrip',
@@ -15,10 +12,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="id">
       <body className="font-inter">
         <AuthProvider>
-          <Navbar />
-          <main className="pt-[64px]">{children}</main>
-          <FooterSection />
-          <NusaAIChat />
+          <ConditionalLayout>{children}</ConditionalLayout>
         </AuthProvider>
       </body>
     </html>

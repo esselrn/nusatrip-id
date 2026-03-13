@@ -41,7 +41,8 @@ export default function RiwayatPesananPage() {
 
   useEffect(() => {
     if (!loading && !user) router.push('/auth/login?redirect=/riwayat-pesanan')
-  }, [user, loading, router])
+    if (!loading && profile?.role === 'admin') router.push('/admin')
+  }, [user, loading, router, profile?.role])
 
   useEffect(() => {
     if (!user) return
@@ -61,11 +62,8 @@ export default function RiwayatPesananPage() {
           .order('created_at', { ascending: false })
       ])
 
-      if (e1) console.error('package_bookings error:', e1)
-      if (e2) console.error('destination_bookings error:', e2)
-      console.log('USER ID:', user.id)
-      console.log('paketBookings:', paketBookings)
-      console.log('destBookings:', destBookings)
+      if (e1?.message) console.error('package_bookings error:', e1.message)
+      if (e2?.message) console.error('destination_bookings error:', e2.message)
 
       const mapped: Booking[] = [
         ...(paketBookings ?? []).map((b: Record<string, unknown>) => ({
