@@ -126,53 +126,49 @@ export default function OverviewTab({ stats, setTab }: { stats: Stats | null; se
   return (
     <div className="space-y-6">
       {/* Banner */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-[#0B2C4D] via-[#123b6b] to-[#1a4a7a] rounded-2xl p-6 text-white">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/4" />
-        <div className="absolute bottom-0 right-24 w-32 h-32 bg-[#FB8C00]/10 rounded-full translate-y-1/2" />
+      <div className="relative overflow-hidden bg-gradient-to-r from-[#0B2C4D] via-[#123b6b] to-[#1a4a7a] rounded-2xl p-4 md:p-6 text-white">
+        <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/4" />
         <div className="relative z-10">
-          <div className="flex items-center gap-2 mb-2">
-            <TrendingUp size={18} className="text-[#FB8C00]" />
-            <span className="text-white/60 text-sm">Ringkasan performa website</span>
+          <div className="flex items-center gap-2 mb-1">
+            <TrendingUp size={16} className="text-[#FB8C00]" />
+            <span className="text-white/60 text-xs">Ringkasan performa website</span>
           </div>
-          <h2 className="text-2xl font-bold mb-1">Dashboard Admin NusaTrip</h2>
-          <p className="text-white/50 text-sm mb-4">Kelola seluruh data website dari satu tempat.</p>
-          <div className="flex flex-wrap gap-4">
-            <div className="bg-white/10 rounded-xl px-4 py-2.5">
-              <p className="text-2xl font-bold">{totalBookings}</p>
-              <p className="text-white/60 text-xs">Total Semua Pesanan</p>
+          <h2 className="text-lg md:text-2xl font-bold mb-1">Dashboard Admin NusaTrip</h2>
+          <p className="text-white/50 text-xs mb-3 hidden sm:block">Kelola seluruh data website dari satu tempat.</p>
+          <div className="flex flex-wrap gap-2 md:gap-4">
+            <div className="bg-white/10 rounded-xl px-3 py-2">
+              <p className="text-lg md:text-2xl font-bold">{totalBookings}</p>
+              <p className="text-white/60 text-[10px]">Total Pesanan</p>
             </div>
-            <div className="bg-white/10 rounded-xl px-4 py-2.5">
-              <p className="text-2xl font-bold text-amber-300">{stats.pendingBookings}</p>
-              <p className="text-white/60 text-xs">Perlu Dikonfirmasi</p>
+            <div className="bg-white/10 rounded-xl px-3 py-2">
+              <p className="text-lg md:text-2xl font-bold text-amber-300">{stats.pendingBookings}</p>
+              <p className="text-white/60 text-[10px]">Perlu Konfirmasi</p>
             </div>
-            <div className="bg-white/10 rounded-xl px-4 py-2.5">
-              <p className="text-2xl font-bold text-emerald-300">{stats.confirmedBookings}</p>
-              <p className="text-white/60 text-xs">Sudah Dikonfirmasi</p>
+            <div className="bg-white/10 rounded-xl px-3 py-2">
+              <p className="text-lg md:text-2xl font-bold text-emerald-300">{stats.confirmedBookings}</p>
+              <p className="text-white/60 text-[10px]">Dikonfirmasi</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Stats grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         {cards.map(({ label, value, icon: Icon, color, bg, tab, sub }) => (
           <button
             key={label}
             onClick={() => setTab(tab)}
-            className={`bg-gradient-to-br ${bg} rounded-2xl p-4 border border-white shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all text-left group`}
+            className={`bg-gradient-to-br ${bg} rounded-xl p-3 md:p-4 border border-white hover:shadow-md hover:-translate-y-0.5 transition-all text-left group`}
           >
-            <div className="flex items-center justify-between mb-3">
-              <div className="w-9 h-9 rounded-xl bg-white shadow-sm flex items-center justify-center">
-                <Icon size={16} style={{ color }} />
+            <div className="flex items-center justify-between mb-2">
+              <div className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center">
+                <Icon size={15} style={{ color }} />
               </div>
-              <ArrowRight
-                size={13}
-                className="text-gray-300 group-hover:text-gray-500 group-hover:translate-x-0.5 transition-all"
-              />
+              <ArrowRight size={11} className="text-gray-300 group-hover:text-gray-500 transition-all" />
             </div>
-            <p className="text-2xl font-bold text-[#0B2C4D] leading-none">{value.toLocaleString()}</p>
-            <p className="text-xs font-semibold text-[#0B2C4D]/70 mt-1">{label}</p>
-            <p className="text-[10px] text-gray-400 mt-0.5">{sub}</p>
+            <p className="text-xl md:text-2xl font-bold text-[#0B2C4D] leading-none">{value.toLocaleString()}</p>
+            <p className="text-xs font-semibold text-[#0B2C4D]/70 mt-1 leading-tight">{label}</p>
+            <p className="text-[10px] text-gray-400 mt-0.5 hidden sm:block">{sub}</p>
           </button>
         ))}
       </div>

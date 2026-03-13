@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/auth-context'
 import { supabase } from '@/lib/supabase'
-import { Bell, RefreshCw } from 'lucide-react'
+import { Bell, RefreshCw, Menu } from 'lucide-react'
 import AdminSidebar, { type Tab, NAV_ITEMS } from '@/components/admin/admin-sidebar'
 import OverviewTab, { type Stats } from '@/components/admin/overview-tab'
 import PesananTab from '@/components/admin/pesanan-tab'
@@ -19,10 +19,19 @@ export default function AdminPage() {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [stats, setStats] = useState<Stats | null>(null)
 
+  // On mobile default closed
   useEffect(() => {
-    if (!loading && (!user || profile?.role !== 'admin')) {
-      router.push('/')
+    const check = () => {
+      if (window.innerWidth < 768) setSidebarOpen(false)
+      else setSidebarOpen(true)
     }
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
+
+  useEffect(() => {
+    if (!loading && (!user || profile?.role !== 'admin')) router.push('/')
   }, [user, profile, loading, router])
 
   const fetchStats = useCallback(async () => {
@@ -82,10 +91,10 @@ export default function AdminPage() {
         <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin" />
       </div>
     )
-
   if (profile.role !== 'admin') return null
 
   const currentLabel = NAV_ITEMS.find((n: { id: Tab }) => n.id === tab)?.label ?? 'Dashboard'
+  const sidebarW = sidebarOpen ? 'ml-[220px]' : 'ml-[52px]'
 
   return (
     <div className="min-h-screen bg-[#F0F4F8] flex">
@@ -97,35 +106,46 @@ export default function AdminPage() {
         adminName={profile.full_name ?? 'Admin'}
         adminEmail={user?.email ?? ''}
       />
-      <main
-        className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${sidebarOpen ? 'ml-[240px]' : 'ml-[68px]'}`}
-      >
-        <header className="sticky top-0 z-30 bg-white border-b border-gray-100 shadow-sm">
-          <div className="flex items-center justify-between h-[64px] px-6">
-            <div>
-              <h1 className="font-bold text-[#0B2C4D] text-base leading-tight">{currentLabel}</h1>
-              <p className="text-[11px] text-gray-400">Admin Panel NusaTrip</p>
+
+      <main className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${sidebarW} min-w-0`}>
+        {/* Topbar */}
+        <header className="sticky top-0 z-30 bg-white border-b border-gray-100">
+          <div className="flex items-center justify-between h-[60px] px-4 gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <button
+                onClick={() => setSidebarOpen((o) => !o)}
+                className="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center text-gray-500 transition shrink-0"
+              >
+                <Menu size={17} />
+              </button>
+              <div className="min-w-0">
+                <h1 className="font-bold text-[#0B2C4D] text-sm md:text-base leading-tight truncate">{currentLabel}</h1>
+                <p className="text-[10px] text-gray-400 hidden sm:block">Admin Panel NusaTrip</p>
+              </div>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 shrink-0">
               {(stats?.pendingBookings ?? 0) > 0 && (
                 <button
                   onClick={() => setTab('pesanan')}
-                  className="flex items-center gap-2 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-700 text-xs font-semibold px-3 py-1.5 rounded-full transition"
+                  className="flex items-center gap-1.5 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-semibold px-2.5 py-1.5 rounded-full transition hover:bg-amber-100"
                 >
-                  <Bell size={13} />
-                  {stats!.pendingBookings} pesanan pending
+                  <Bell size={12} />
+                  <span className="hidden sm:inline">{stats!.pendingBookings} pending</span>
+                  <span className="sm:hidden">{stats!.pendingBookings}</span>
                 </button>
               )}
               <button
                 onClick={fetchStats}
-                className="w-9 h-9 rounded-lg hover:bg-gray-100 flex items-center justify-center transition text-gray-400"
+                className="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center text-gray-400 transition"
               >
-                <RefreshCw size={15} />
+                <RefreshCw size={14} />
               </button>
             </div>
           </div>
         </header>
-        <div className="flex-1 p-6">
+
+        {/* Content */}
+        <div className="flex-1 p-3 md:p-6 min-w-0 overflow-x-hidden">
           {tab === 'overview' && <OverviewTab stats={stats} setTab={setTab} />}
           {tab === 'pesanan' && <PesananTab />}
           {CRUD_TABS.includes(tab) && <CrudTab tab={tab} onDataChange={fetchStats} />}

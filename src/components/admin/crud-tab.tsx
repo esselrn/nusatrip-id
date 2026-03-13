@@ -270,7 +270,7 @@ export default function CrudTab({ tab, onDataChange }: Props) {
   return (
     <div className="space-y-4">
       {/* Toolbar */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex flex-wrap gap-3 items-center">
+      <div className="bg-white rounded-xl border border-gray-100 p-3 flex flex-col sm:flex-row flex-wrap gap-2 items-start sm:items-center">
         <div className="relative flex-1 min-w-[200px]">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
@@ -299,7 +299,7 @@ export default function CrudTab({ tab, onDataChange }: Props) {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <div className="w-7 h-7 border-2 border-gray-200 border-t-[#0B2C4D] rounded-full animate-spin" />
