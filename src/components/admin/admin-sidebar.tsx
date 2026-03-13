@@ -106,11 +106,7 @@ export default function AdminSidebar({ tab, setTab, open, setOpen, adminName, ad
           </div>
         )}
         <button
-          onClick={() =>
-            alert(
-              'Gunakan mode Incognito (Ctrl+Shift+N) atau browser lain untuk login sebagai pengguna agar sesi admin tidak terganggu.'
-            )
-          }
+          onClick={() => window.open('/', '_blank')}
           title={!open ? 'Lihat sebagai pengguna' : undefined}
           className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-white/50 hover:text-white hover:bg-white/[0.08] transition text-xs"
         >
