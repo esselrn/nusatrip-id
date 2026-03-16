@@ -1,10 +1,15 @@
 import '@/shared/styles/globals.css'
 import { AuthProvider } from '@/contexts/auth-context'
 import ConditionalLayout from '@/components/organisms/conditional-layout'
+import type { Metadata } from 'next'
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'NusaTrip',
-  description: 'Platform perjalanan wisata Indonesia'
+  description: 'Platform perjalanan wisata Indonesia',
+  icons: {
+    icon: '/assets/favicon.PNG',
+    apple: '/assets/favicon.PNG'
+  }
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
