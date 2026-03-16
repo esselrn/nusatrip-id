@@ -56,8 +56,11 @@ export default function FooterSection() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <Image src="/assets/logo.png" alt="NusaTrip Logo" width={150} height={64} />
-              <span className="font-montserrat font-bold text-xl tracking-widest" style={gradientTextStyle}>
+              <Image src="/assets/logo.png" alt="NusaTrip Logo" width={80} height={60} />
+              <span
+                className="font-montserrat font-bold text-xl tracking-widest whitespace-nowrap"
+                style={gradientTextStyle}
+              >
                 NUSA TRIP
               </span>
             </div>
