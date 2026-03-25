@@ -31,7 +31,13 @@ export default function AdminPage() {
   }, [])
 
   useEffect(() => {
-    if (!loading && (!user || profile?.role !== 'admin')) router.push('/')
+    if (!loading && (!user || profile?.role !== 'admin')) {
+      if (sessionStorage.getItem('view-as-user')) {
+        sessionStorage.removeItem('view-as-user')
+        return
+      }
+      router.push('/auth/login')
+    }
   }, [user, profile, loading, router])
 
   const fetchStats = useCallback(async () => {

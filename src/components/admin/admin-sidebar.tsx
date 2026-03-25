@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import {
@@ -42,7 +43,7 @@ export default function AdminSidebar({ tab, setTab, open, setOpen, adminName, ad
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
-    router.push('/')
+    router.push('/auth/login')
   }
 
   return (
@@ -55,8 +56,8 @@ export default function AdminSidebar({ tab, setTab, open, setOpen, adminName, ad
     >
       {/* Logo + Close */}
       <div className="flex items-center h-[60px] border-b border-white/10 shrink-0 px-3 gap-3">
-        <div className="w-7 h-7 rounded-lg bg-[#FB8C00] flex items-center justify-center shrink-0 font-bold text-white text-xs select-none">
-          N
+        <div className="w-7 h-7 rounded-lg overflow-hidden shrink-0 flex items-center justify-center bg-white/10">
+          <Image src="/assets/logo.png" alt="NusaTrip" width={28} height={28} className="object-contain" />
         </div>
         {open && (
           <>
@@ -106,7 +107,11 @@ export default function AdminSidebar({ tab, setTab, open, setOpen, adminName, ad
           </div>
         )}
         <button
-          onClick={() => window.open('/', '_blank')}
+          onClick={async () => {
+            sessionStorage.setItem('view-as-user', '1')
+            await supabase.auth.signOut()
+            window.location.href = '/'
+          }}
           title={!open ? 'Lihat sebagai pengguna' : undefined}
           className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-white/50 hover:text-white hover:bg-white/[0.08] transition text-xs"
         >
