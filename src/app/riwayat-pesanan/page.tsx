@@ -1,10 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/auth-context'
 import { supabase } from '@/lib/supabase'
 import Image from 'next/image'
+import { useNotif } from '@/contexts/notif-context'
 import {
   Package,
   MapPin,
@@ -61,13 +62,18 @@ export default function RiwayatPesananPage() {
   const [fetching, setFetching] = useState(true)
   const [tab, setTab] = useState<'semua' | 'paket' | 'destinasi'>('semua')
   const [payingId, setPayingId] = useState<string | null>(null)
+  const { clearNotif } = useNotif()
+
+  // Clear notif once when page mounts (user has seen their orders)
+  useEffect(() => {
+    clearNotif()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     const script = document.createElement('script')
     script.src = 'https://app.sandbox.midtrans.com/snap/snap.js'
     script.setAttribute('data-client-key', process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY ?? '')
-    script.onload = () => console.log('✅ Snap.js loaded, window.snap:', typeof window.snap)
-    script.onerror = () => console.error('❌ Snap.js GAGAL dimuat!')
     document.head.appendChild(script)
     return () => {
       if (document.head.contains(script)) document.head.removeChild(script)
@@ -79,18 +85,19 @@ export default function RiwayatPesananPage() {
     if (!loading && profile?.role === 'admin') router.push('/admin')
   }, [user, loading, router, profile?.role])
 
-  const fetchData = async (userId: string) => {
+  const fetchData = useCallback(async () => {
+    if (!user) return
     setFetching(true)
     const [{ data: pb }, { data: db }] = await Promise.all([
       supabase
         .from('package_bookings')
         .select('*, packages(name, cover_image_url, location)')
-        .eq('user_id', userId)
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false }),
       supabase
         .from('destination_bookings')
         .select('*, destinations(name, cover_image_url, location)')
-        .eq('user_id', userId)
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false })
     ])
     const mapped: Booking[] = [
@@ -111,59 +118,14 @@ export default function RiwayatPesananPage() {
     ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
     setBookings(mapped)
     setFetching(false)
-  }
-
-  useEffect(() => {
-    if (!user) return
-    let cancelled = false
-
-    const load = async () => {
-      setFetching(true)
-      const [{ data: pb }, { data: db }] = await Promise.all([
-        supabase
-          .from('package_bookings')
-          .select('*, packages(name, cover_image_url, location)')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false }),
-        supabase
-          .from('destination_bookings')
-          .select('*, destinations(name, cover_image_url, location)')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false })
-      ])
-      const mapped: Booking[] = [
-        ...(pb ?? []).map((b: Record<string, unknown>) => ({
-          ...(b as Booking),
-          type: 'paket' as const,
-          title: (b.packages as Record<string, string>)?.name ?? '-',
-          cover_image_url: (b.packages as Record<string, string>)?.cover_image_url ?? '',
-          location: (b.packages as Record<string, string>)?.location ?? '-'
-        })),
-        ...(db ?? []).map((b: Record<string, unknown>) => ({
-          ...(b as Booking),
-          type: 'destinasi' as const,
-          title: (b.destinations as Record<string, string>)?.name ?? '-',
-          cover_image_url: (b.destinations as Record<string, string>)?.cover_image_url ?? '',
-          location: (b.destinations as Record<string, string>)?.location ?? '-'
-        }))
-      ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-
-      if (!cancelled) {
-        setBookings(mapped)
-        setFetching(false)
-      }
-    }
-
-    load()
-    return () => {
-      cancelled = true
-    }
   }, [user])
 
-  // gimmick langsung pembayaran berhasil
+  useEffect(() => {
+    if (!loading && user) fetchData()
+  }, [user, loading, fetchData])
+
   const handlePay = async (booking: Booking) => {
     setPayingId(booking.id)
-
     try {
       const res = await fetch('/api/payment/create', {
         method: 'POST',
@@ -178,148 +140,54 @@ export default function RiwayatPesananPage() {
           itemName: booking.title
         })
       })
-
       const data = await res.json()
-
-      if (!data.token || typeof window.snap === 'undefined') {
-        alert('Snap tidak siap / token gagal')
-        setPayingId(null)
-        return
+      if (data.token) {
+        window.snap.pay(data.token, {
+          onSuccess: () => {
+            fetchData()
+            setPayingId(null)
+          },
+          onPending: () => {
+            fetchData()
+            setPayingId(null)
+          },
+          onError: () => setPayingId(null),
+          onClose: () => setPayingId(null)
+        })
       }
-
-      // 🔥 OPEN SNAP POPUP
-      window.snap.pay(data.token, {
-        onSuccess: () => {},
-        onPending: () => {},
-        onError: () => {},
-
-        onClose: () => {
-          console.log('🚪 Snap ditutup (block redirect)')
-        }
-      })
-
-      // 🔥 AUTO CLOSE SNAP + FORCE SUCCESS
-      setTimeout(async () => {
-        console.log('⚡ FORCE SUCCESS + CLOSE SNAP')
-
-        // tutup popup (paksa)
-        const snapFrame = document.querySelector('iframe.snap-midtrans')
-        if (snapFrame) {
-          snapFrame.remove()
-        }
-
-        await supabase
-          .from(booking.type === 'paket' ? 'package_bookings' : 'destination_bookings')
-          .update({
-            status: 'paid',
-            paid_at: new Date().toISOString(),
-            payment_token: data.order_id
-          })
-          .eq('id', booking.id)
-
-        await fetchData(user!.id)
-
-        setPayingId(null)
-      }, 2000)
-    } catch (err) {
-      console.error('❌ handlePay error:', err)
+    } catch {
       setPayingId(null)
     }
   }
-  // sampe sini
 
-const handleDownloadBukti = async (booking: Booking) => {
-  const { default: jsPDF } = await import('jspdf') // 🔥 dynamic import (ANTI ERROR)
-
-  const doc = new jsPDF()
-
-  const date = booking.travel_date || booking.visit_date
-
-  const left = 20
-  const right = 190
-  let y = 20
-
-  // HEADER
-  doc.setFont('helvetica', 'bold')
-  doc.setFontSize(18)
-  doc.text('NusaTrip', 105, y, { align: 'center' })
-
-  y += 8
-  doc.setFontSize(11)
-  doc.setTextColor(120)
-  doc.text('E-Receipt / Bukti Pembayaran', 105, y, { align: 'center' })
-
-  y += 10
-  doc.setTextColor(22, 163, 74)
-  doc.setFontSize(12)
-  doc.text('PEMBAYARAN BERHASIL', 105, y, { align: 'center' })
-
-  // garis
-  y += 8
-  doc.setDrawColor(220)
-  doc.line(left, y, right, y)
-
-  y += 10
-
-  const row = (label: string, value: string) => {
-    doc.setFontSize(11)
-    doc.setTextColor(120)
-    doc.setFont('helvetica', 'normal')
-    doc.text(label, left, y)
-
-    doc.setFont('helvetica', 'bold')
-    doc.setTextColor(0)
-    doc.text(value, right, y, { align: 'right' })
-
-    y += 8
+  const handleDownloadBukti = (booking: Booking) => {
+    const date = booking.travel_date || booking.visit_date
+    const content = [
+      'BUKTI PEMBAYARAN - NUSATRIP',
+      '='.repeat(40),
+      `ID Pesanan   : ${booking.id}`,
+      `Nama         : ${booking.full_name}`,
+      `Wisata       : ${booking.title}`,
+      `Lokasi       : ${booking.location}`,
+      `Tanggal      : ${date ? new Date(date).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) : '-'}`,
+      `Peserta      : ${booking.participants} Orang`,
+      `Total Bayar  : Rp ${Number(booking.total_price).toLocaleString('id-ID')}`,
+      `Status       : LUNAS`,
+      `Tgl Bayar    : ${booking.paid_at ? new Date(booking.paid_at).toLocaleString('id-ID') : '-'}`,
+      '='.repeat(40),
+      '',
+      'Terima kasih telah memesan bersama NusaTrip!',
+      'Segera persiapkan keberangkatan Anda sesuai jadwal yang Anda pesan.',
+      'Selamat berlibur! 🎉'
+    ].join('\n')
+    const blob = new Blob([content], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `bukti-pembayaran-${booking.id.slice(0, 8)}.txt`
+    a.click()
+    URL.revokeObjectURL(url)
   }
-
-  row('ID Pesanan', booking.id)
-  row('Nama', booking.full_name)
-  row('Wisata', booking.title)
-  row('Lokasi', booking.location)
-  row(
-    'Tanggal',
-    date
-      ? new Date(date).toLocaleDateString('id-ID', {
-          weekday: 'long',
-          day: 'numeric',
-          month: 'long',
-          year: 'numeric'
-        })
-      : '-'
-  )
-  row('Peserta', `${booking.participants} Orang`)
-
-  // total
-  y += 5
-  doc.line(left, y, right, y)
-
-  y += 10
-  doc.setFontSize(13)
-  doc.setFont('helvetica', 'bold')
-
-  doc.text('Total Pembayaran', left, y)
-  doc.text(`Rp ${Number(booking.total_price).toLocaleString('id-ID')}`, right, y, { align: 'right' })
-
-  y += 8
-  doc.setFontSize(10)
-  doc.setTextColor(120)
-  doc.setFont('helvetica', 'normal')
-
-  doc.text('Tanggal Bayar', left, y)
-  doc.text(booking.paid_at ? new Date(booking.paid_at).toLocaleString('id-ID') : '-', right, y, { align: 'right' })
-
-  // footer
-  y += 20
-  doc.setFontSize(9)
-  doc.setTextColor(140)
-  doc.text('Terima kasih telah memesan di NusaTrip\nSelamat berlibur & nikmati perjalanan Anda ✨', 105, y, {
-    align: 'center'
-  })
-
-  doc.save(`bukti-${booking.id.slice(0, 8)}.pdf`)
-}
 
   const filtered = tab === 'semua' ? bookings : bookings.filter((b) => b.type === tab)
 
@@ -334,7 +202,15 @@ const handleDownloadBukti = async (booking: Booking) => {
     <div className="min-h-screen bg-gray-50">
       <div className="bg-[#0B2C4D] pt-20 pb-10 px-6">
         <div className="max-w-[900px] mx-auto">
-          <p className="text-white/50 text-sm mb-1">Akun Saya</p>
+          <div className="flex items-center justify-between mb-1">
+            <p className="text-white/50 text-sm">Akun Saya</p>
+            <button
+              onClick={() => router.push('/profil')}
+              className="text-xs text-white/50 hover:text-white border border-white/20 hover:border-white/40 px-3 py-1 rounded-full transition"
+            >
+              Edit Profil
+            </button>
+          </div>
           <h1 className="font-montserrat font-bold text-2xl text-white">Riwayat Pesanan</h1>
           <p className="text-white/60 text-sm mt-1">
             Halo, <span className="text-white font-medium">{profile?.full_name}</span> — {bookings.length} total pesanan

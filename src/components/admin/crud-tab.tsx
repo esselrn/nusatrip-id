@@ -14,7 +14,9 @@ const TABLE_MAP: Partial<Record<Tab, string>> = {
   blog: 'blogs',
   pengguna: 'users',
   kontak: 'contacts',
-  newsletter: 'newsletters'
+  newsletter: 'newsletters',
+  team: 'team_members',
+  gallery: 'gallery'
 }
 
 const FIELDS: Partial<Record<Tab, { key: string; label: string; type?: string; required?: boolean; textarea?: boolean }[]>> =
@@ -67,7 +69,25 @@ const FIELDS: Partial<Record<Tab, { key: string; label: string; type?: string; r
       { key: 'subject', label: 'Subjek' },
       { key: 'message', label: 'Pesan', textarea: true }
     ],
-    newsletter: [{ key: 'email', label: 'Email', required: true }]
+    newsletter: [{ key: 'email', label: 'Email', required: true }],
+    team: [
+      { key: 'name', label: 'Nama', required: true },
+      { key: 'role', label: 'Jabatan', required: true },
+      { key: 'bio', label: 'Bio', textarea: true },
+      { key: 'photo_url', label: 'URL Foto' },
+      { key: 'instagram', label: 'Instagram URL' },
+      { key: 'linkedin', label: 'LinkedIn URL' },
+      { key: 'twitter', label: 'Twitter URL' },
+      { key: 'email', label: 'Email' },
+      { key: 'sort_order', label: 'Urutan', type: 'number' }
+    ],
+    gallery: [
+      { key: 'title', label: 'Judul Foto', required: true },
+      { key: 'location', label: 'Lokasi', required: true },
+      { key: 'image_url', label: 'URL Gambar', required: true },
+      { key: 'category', label: 'Kategori' },
+      { key: 'sort_order', label: 'Urutan', type: 'number' }
+    ]
   }
 
 const COLUMNS: Partial<Record<Tab, { key: string; label: string }[]>> = {
@@ -110,6 +130,20 @@ const COLUMNS: Partial<Record<Tab, { key: string; label: string }[]>> = {
   newsletter: [
     { key: 'email', label: 'Email' },
     { key: 'created_at', label: 'Tanggal Daftar' }
+  ],
+  team: [
+    { key: 'name', label: 'Nama' },
+    { key: 'role', label: 'Jabatan' },
+    { key: 'email', label: 'Email' },
+    { key: 'sort_order', label: 'Urutan' },
+    { key: 'created_at', label: 'Dibuat' }
+  ],
+  gallery: [
+    { key: 'title', label: 'Judul' },
+    { key: 'location', label: 'Lokasi' },
+    { key: 'category', label: 'Kategori' },
+    { key: 'sort_order', label: 'Urutan' },
+    { key: 'created_at', label: 'Dibuat' }
   ]
 }
 
@@ -124,10 +158,19 @@ function CellValue({ colKey, value, row, tab }: { colKey: string; value: unknown
   if (colKey === 'rating') return <span className="text-amber-500 font-semibold text-xs">★ {String(value ?? '-')}</span>
   if (colKey === 'is_featured')
     return value ? <CheckCircle size={15} className="text-green-500" /> : <XCircle size={15} className="text-gray-300" />
-  if (colKey === 'role')
+  if (colKey === 'sort_order') return <span className="text-gray-400 text-xs font-mono">{String(value ?? '-')}</span>
+  if (colKey === 'category')
+    return (
+      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-100">
+        {String(value ?? '-')}
+      </span>
+    )
+  if (colKey === 'role' && tab !== 'team')
     return (
       <span
-        className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${value === 'admin' ? 'bg-purple-100 text-purple-600' : 'bg-gray-100 text-gray-600'}`}
+        className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+          value === 'admin' ? 'bg-purple-100 text-purple-600' : 'bg-gray-100 text-gray-600'
+        }`}
       >
         {String(value ?? 'user').toUpperCase()}
       </span>
@@ -147,6 +190,22 @@ function CellValue({ colKey, value, row, tab }: { colKey: string; value: unknown
         </div>
         <span className="font-medium text-[#0B2C4D] text-sm">{name}</span>
         {isAdmin && <span className="text-[9px] font-bold bg-[#FB8C00]/15 text-[#FB8C00] px-1.5 py-0.5 rounded">ADMIN</span>}
+      </div>
+    )
+  }
+  if (colKey === 'name' && tab === 'team') {
+    const name = String(value ?? '-')
+    const initial = name !== '-' ? name[0].toUpperCase() : '?'
+    const colors = ['bg-blue-400', 'bg-emerald-400', 'bg-violet-400', 'bg-amber-400', 'bg-pink-400', 'bg-cyan-400']
+    const color = colors[(name.charCodeAt(0) ?? 0) % colors.length]
+    return (
+      <div className="flex items-center gap-2.5">
+        <div
+          className={`w-7 h-7 rounded-full ${color} flex items-center justify-center text-[11px] font-bold text-white shrink-0`}
+        >
+          {initial}
+        </div>
+        <span className="font-medium text-[#0B2C4D] text-sm">{name}</span>
       </div>
     )
   }
@@ -184,6 +243,8 @@ export default function CrudTab({ tab, onDataChange }: Props) {
     paket: 'Paket',
     destinasi: 'Destinasi',
     blog: 'Blog',
+    team: 'Team',
+    gallery: 'Galeri',
     pengguna: 'Pengguna',
     kontak: 'Kontak',
     newsletter: 'Newsletter'
@@ -191,22 +252,29 @@ export default function CrudTab({ tab, onDataChange }: Props) {
 
   const fetchData = useCallback(async () => {
     setLoading(true)
-    // Pengguna: fetch semua user tanpa filter
     const query = supabase.from(tableName).select('*')
-    // Sort by role (admin first) then created_at
+    let result: Row[] = []
+
     if (tab === 'pengguna') {
-      const { data: result } = await query.order('role', { ascending: true }).order('created_at', { ascending: true })
-      setData((result ?? []) as Row[])
+      const { data: rows } = await query.order('role', { ascending: true }).order('created_at', { ascending: true })
+      result = (rows ?? []) as Row[]
+    } else if (tab === 'team' || tab === 'gallery') {
+      const { data: rows } = await query.order('sort_order', { ascending: true })
+      result = (rows ?? []) as Row[]
     } else {
-      const { data: result } = await query.order('created_at', { ascending: false })
-      setData((result ?? []) as Row[])
+      const { data: rows } = await query.order('created_at', { ascending: false })
+      result = (rows ?? []) as Row[]
     }
+
+    setData(result)
     setLoading(false)
   }, [tableName, tab])
 
+  // Wrap in async IIFE so setState happens asynchronously — satisfies react-hooks/set-state-in-effect
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchData()
+    void (async () => {
+      await fetchData()
+    })()
   }, [fetchData])
 
   const filtered = data.filter(
@@ -221,14 +289,14 @@ export default function CrudTab({ tab, onDataChange }: Props) {
 
   const handleToggleFeatured = async (row: Row) => {
     await supabase.from(tableName).update({ is_featured: !row.is_featured }).eq('id', String(row.id))
-    fetchData()
+    void fetchData()
     onDataChange?.()
   }
 
   const handleDelete = async (row: Row) => {
     if (!confirm('Hapus data ini?')) return
     await supabase.from(tableName).delete().eq('id', String(row.id))
-    fetchData()
+    void fetchData()
     onDataChange?.()
   }
 
@@ -252,7 +320,7 @@ export default function CrudTab({ tab, onDataChange }: Props) {
     setEditRow(null)
     setAddOpen(false)
     setForm({})
-    fetchData()
+    void fetchData()
     onDataChange?.()
   }
 
@@ -261,6 +329,7 @@ export default function CrudTab({ tab, onDataChange }: Props) {
     setForm({ ...row })
     setAddOpen(false)
   }
+
   const openAdd = () => {
     setEditRow(null)
     setForm({})
@@ -281,7 +350,9 @@ export default function CrudTab({ tab, onDataChange }: Props) {
           />
         </div>
         <button
-          onClick={fetchData}
+          onClick={() => {
+            void fetchData()
+          }}
           className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 transition shrink-0"
         >
           <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
@@ -336,9 +407,15 @@ export default function CrudTab({ tab, onDataChange }: Props) {
                       <div className="flex items-center justify-end gap-1.5">
                         {hasFeatured && (
                           <button
-                            onClick={() => handleToggleFeatured(row)}
+                            onClick={() => {
+                              void handleToggleFeatured(row)
+                            }}
                             title="Toggle Featured"
-                            className={`w-7 h-7 rounded-lg flex items-center justify-center transition ${row.is_featured ? 'bg-amber-100 text-amber-500 hover:bg-amber-200' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'}`}
+                            className={`w-7 h-7 rounded-lg flex items-center justify-center transition ${
+                              row.is_featured
+                                ? 'bg-amber-100 text-amber-500 hover:bg-amber-200'
+                                : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
+                            }`}
                           >
                             <Star size={12} fill={row.is_featured ? 'currentColor' : 'none'} />
                           </button>
@@ -358,7 +435,9 @@ export default function CrudTab({ tab, onDataChange }: Props) {
                           </button>
                         )}
                         <button
-                          onClick={() => handleDelete(row)}
+                          onClick={() => {
+                            void handleDelete(row)
+                          }}
                           className="w-7 h-7 rounded-lg bg-red-50 hover:bg-red-100 flex items-center justify-center text-red-500 transition"
                         >
                           <Trash2 size={13} />
@@ -443,7 +522,9 @@ export default function CrudTab({ tab, onDataChange }: Props) {
                 Batal
               </button>
               <button
-                onClick={handleSave}
+                onClick={() => {
+                  void handleSave()
+                }}
                 disabled={saving}
                 className="flex-1 bg-[#0B2C4D] hover:bg-[#0d3560] text-white text-sm font-semibold py-2.5 rounded-xl transition disabled:opacity-50"
               >

@@ -10,7 +10,7 @@ import OverviewTab, { type Stats } from '@/components/admin/overview-tab'
 import PesananTab from '@/components/admin/pesanan-tab'
 import CrudTab from '@/components/admin/crud-tab'
 
-const CRUD_TABS: Tab[] = ['paket', 'destinasi', 'blog', 'pengguna', 'kontak', 'newsletter']
+const CRUD_TABS: Tab[] = ['paket', 'destinasi', 'blog', 'pengguna', 'kontak', 'newsletter', 'team', 'gallery']
 
 export default function AdminPage() {
   const { user, profile, loading } = useAuth()

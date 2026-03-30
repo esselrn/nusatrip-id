@@ -13,10 +13,22 @@ import {
   MessageSquare,
   LogOut,
   ChevronRight,
-  X
+  X,
+  Users2,
+  Images
 } from 'lucide-react'
 
-export type Tab = 'overview' | 'pesanan' | 'paket' | 'destinasi' | 'blog' | 'pengguna' | 'kontak' | 'newsletter'
+export type Tab =
+  | 'overview'
+  | 'pesanan'
+  | 'paket'
+  | 'destinasi'
+  | 'blog'
+  | 'pengguna'
+  | 'kontak'
+  | 'newsletter'
+  | 'team'
+  | 'gallery'
 
 export const NAV_ITEMS: { id: Tab; icon: React.ElementType; label: string }[] = [
   { id: 'overview', icon: LayoutDashboard, label: 'Overview' },
@@ -26,7 +38,9 @@ export const NAV_ITEMS: { id: Tab; icon: React.ElementType; label: string }[] = 
   { id: 'blog', icon: BookOpen, label: 'Blog & Artikel' },
   { id: 'pengguna', icon: Users, label: 'Pengguna' },
   { id: 'kontak', icon: MessageSquare, label: 'Kontak' },
-  { id: 'newsletter', icon: Mail, label: 'Newsletter' }
+  { id: 'newsletter', icon: Mail, label: 'Newsletter' },
+  { id: 'team', icon: Users2, label: 'Tim Kami' },
+  { id: 'gallery', icon: Images, label: 'Galeri' }
 ]
 
 interface Props {

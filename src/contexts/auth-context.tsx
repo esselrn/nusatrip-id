@@ -10,15 +10,24 @@ type UserProfile = {
   full_name: string
   role: 'user' | 'admin'
   phone?: string
+  city?: string
+  birthdate?: string
+  avatar_url?: string
 }
 
 type AuthContextType = {
   user: User | null
   profile: UserProfile | null
   loading: boolean
+  refreshProfile: () => Promise<void>
 }
 
-const AuthContext = createContext<AuthContextType>({ user: null, profile: null, loading: true })
+const AuthContext = createContext<AuthContextType>({
+  user: null,
+  profile: null,
+  loading: true,
+  refreshProfile: async () => {}
+})
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
@@ -27,7 +36,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const fetchProfile = async (userId: string) => {
     const { data } = await supabase.from('users').select('*').eq('id', userId).single()
-    setProfile(data)
+
+    if (data) setProfile(data)
+  }
+
+  const refreshProfile = async () => {
+    if (!user) return
+    await fetchProfile(user.id)
   }
 
   useEffect(() => {
@@ -48,7 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => subscription.unsubscribe()
   }, [])
 
-  return <AuthContext.Provider value={{ user, profile, loading }}>{children}</AuthContext.Provider>
+  return <AuthContext.Provider value={{ user, profile, loading, refreshProfile }}>{children}</AuthContext.Provider>
 }
 
 export const useAuth = () => useContext(AuthContext)

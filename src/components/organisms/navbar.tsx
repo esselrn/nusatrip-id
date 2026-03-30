@@ -8,7 +8,8 @@ import NavLink from '@/components/molecules/nav-link'
 import DropdownMenu from '@/components/molecules/dropdown-menu'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/auth-context'
-import { LogOut, ChevronDown, ClipboardList, LayoutDashboard } from 'lucide-react'
+import { useNotif } from '@/contexts/notif-context'
+import { LogOut, ChevronDown, ClipboardList, LayoutDashboard, UserCircle2 } from 'lucide-react'
 import LogoutToast from '@/components/organisms/logout-toast'
 
 export default function Navbar() {
@@ -16,11 +17,10 @@ export default function Navbar() {
   const [active, setActive] = useState<string | null>(null)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [showToast, setShowToast] = useState(false)
-  const [bookingCount, setBookingCount] = useState(0)
-
   const userMenuRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
   const { profile, user } = useAuth()
+  const { hasNotif } = useNotif()
 
   const toggle = (key: string) => setActive(active === key ? null : key)
   const closeMenu = () => {
@@ -35,21 +35,6 @@ export default function Navbar() {
     document.addEventListener('mousedown', handleClick)
     return () => document.removeEventListener('mousedown', handleClick)
   }, [])
-
-  useEffect(() => {
-    if (!user || profile?.role === 'admin') return
-    const fetchCount = async () => {
-      const [{ count: c1 }, { count: c2 }] = await Promise.all([
-        supabase.from('package_bookings').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
-        supabase.from('destination_bookings').select('id', { count: 'exact', head: true }).eq('user_id', user.id)
-      ])
-      setBookingCount((c1 ?? 0) + (c2 ?? 0))
-    }
-    fetchCount()
-    return () => {
-      setBookingCount(0)
-    }
-  }, [user, profile?.role])
 
   const goToFirstPackage = async () => {
     const { data } = await supabase
@@ -107,10 +92,16 @@ export default function Navbar() {
                 { label: 'Detail Destinasi', onClick: goToFirstDestination }
               ]}
             />
-            <DropdownMenu label="Pages" items={[{ href: '/pages/blog-article', label: 'Blog & Article' }]} />
+            <DropdownMenu
+              label="Pages"
+              items={[
+                { href: '/pages/blog-article', label: 'Blog & Article' },
+                { href: '/pages/guide', label: 'Tim Kami' }, // ✅ fixed: was /team
+                { href: '/pages/gallery', label: 'Galeri' } // ✅ fixed: was /gallery
+              ]}
+            />
             <NavLink href="/kontak" label="Kontak" />
 
-            {/* AUTH */}
             <div className="ml-4 pl-4 border-l border-white/15">
               {user && profile ? (
                 <div className="relative" ref={userMenuRef}>
@@ -122,12 +113,8 @@ export default function Navbar() {
                       <div className="w-7 h-7 rounded-full bg-[#FB8C00] flex items-center justify-center text-xs font-bold shrink-0">
                         {initials}
                       </div>
-                      {bookingCount > 0 && (
-                        <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-green-400 rounded-full border border-[#0B2C4D] flex items-center justify-center">
-                          <span className="text-[8px] font-bold text-white leading-none">
-                            {bookingCount > 9 ? '9+' : bookingCount}
-                          </span>
-                        </span>
+                      {hasNotif && (
+                        <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white" />
                       )}
                     </div>
                     <span className="max-w-[100px] truncate text-sm font-medium">{displayName}</span>
@@ -154,21 +141,27 @@ export default function Navbar() {
                         </div>
                       </div>
                       {profile?.role !== 'admin' && (
-                        <Link
-                          href="/riwayat-pesanan"
-                          onClick={() => setUserMenuOpen(false)}
-                          className="flex items-center justify-between px-4 py-3 text-sm hover:bg-orange-50 hover:text-[#FB8C00] transition border-b border-gray-100 group"
-                        >
-                          <div className="flex items-center gap-2.5">
-                            <ClipboardList size={15} className="text-[#0B2C4D] group-hover:text-[#FB8C00]" />
-                            <span>Riwayat Pesanan</span>
-                          </div>
-                          {bookingCount > 0 && (
-                            <span className="bg-[#FB8C00] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
-                              {bookingCount}
-                            </span>
-                          )}
-                        </Link>
+                        <>
+                          <Link
+                            href="/profil"
+                            onClick={() => setUserMenuOpen(false)}
+                            className="flex items-center gap-2.5 px-4 py-3 text-sm hover:bg-blue-50 hover:text-blue-600 transition border-b border-gray-100 group"
+                          >
+                            <UserCircle2 size={15} className="text-[#0B2C4D] group-hover:text-blue-600" />
+                            <span>Profil Saya</span>
+                          </Link>
+                          <Link
+                            href="/riwayat-pesanan"
+                            onClick={() => setUserMenuOpen(false)}
+                            className="flex items-center justify-between px-4 py-3 text-sm hover:bg-orange-50 hover:text-[#FB8C00] transition border-b border-gray-100 group"
+                          >
+                            <div className="flex items-center gap-2.5">
+                              <ClipboardList size={15} className="text-[#0B2C4D] group-hover:text-[#FB8C00]" />
+                              <span>Riwayat Pesanan</span>
+                            </div>
+                            {hasNotif && <span className="w-2 h-2 bg-red-500 rounded-full" />}
+                          </Link>
+                        </>
                       )}
                       {profile?.role === 'admin' && (
                         <Link
@@ -240,10 +233,8 @@ export default function Navbar() {
                   <div className="w-10 h-10 rounded-full bg-[#FB8C00] flex items-center justify-center font-bold text-sm shrink-0">
                     {initials}
                   </div>
-                  {bookingCount > 0 && (
-                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full border border-[#061E36] flex items-center justify-center">
-                      <span className="text-[8px] font-bold text-white">{bookingCount > 9 ? '9+' : bookingCount}</span>
-                    </span>
+                  {hasNotif && (
+                    <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-[#061E36]" />
                   )}
                 </div>
                 <div className="overflow-hidden">
@@ -351,6 +342,20 @@ export default function Navbar() {
                   >
                     Blog & Article
                   </Link>
+                  <Link
+                    href="/pages/guide"
+                    onClick={closeMenu}
+                    className="flex items-center h-10 text-white/60 hover:text-white transition text-sm"
+                  >
+                    Tim Kami
+                  </Link>
+                  <Link
+                    href="/pages/gallery"
+                    onClick={closeMenu}
+                    className="flex items-center h-10 text-white/60 hover:text-white transition text-sm"
+                  >
+                    Galeri
+                  </Link>
                 </div>
               )}
             </div>
@@ -359,20 +364,25 @@ export default function Navbar() {
               {user && profile ? (
                 <>
                   {profile?.role !== 'admin' && (
-                    <Link
-                      href="/riwayat-pesanan"
-                      onClick={closeMenu}
-                      className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-white/10 text-white hover:bg-white/15 transition text-sm font-semibold"
-                    >
-                      <div className="flex items-center gap-2">
-                        <ClipboardList size={15} /> Riwayat Pesanan
-                      </div>
-                      {bookingCount > 0 && (
-                        <span className="bg-[#FB8C00] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
-                          {bookingCount}
-                        </span>
-                      )}
-                    </Link>
+                    <>
+                      <Link
+                        href="/profil"
+                        onClick={closeMenu}
+                        className="w-full flex items-center gap-2 px-4 py-3 rounded-xl bg-white/10 text-white hover:bg-white/15 transition text-sm font-semibold"
+                      >
+                        <UserCircle2 size={15} /> Profil Saya
+                      </Link>
+                      <Link
+                        href="/riwayat-pesanan"
+                        onClick={closeMenu}
+                        className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-white/10 text-white hover:bg-white/15 transition text-sm font-semibold"
+                      >
+                        <div className="flex items-center gap-2">
+                          <ClipboardList size={15} /> Riwayat Pesanan
+                        </div>
+                        {hasNotif && <span className="w-2 h-2 bg-red-500 rounded-full" />}
+                      </Link>
+                    </>
                   )}
                   {profile?.role === 'admin' && (
                     <Link
