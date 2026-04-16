@@ -1,7 +1,7 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
-import Navbar from '@/components/organisms/navbar'
+import Navbar from '@/components/organisms/Navbar'
 import FooterSection from '@/components/organisms/footer'
 import NusaAIChat from '@/components/organisms/nusa-ai-chat'
 import { NotifProvider } from '@/contexts/notif-context'
