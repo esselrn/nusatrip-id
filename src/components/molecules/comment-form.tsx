@@ -3,8 +3,8 @@
 import { useState } from 'react'
 import { useParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
-import Input from '@/components/atoms/input'
-import Button from '@/components/atoms/button'
+import Input from '@/components/atoms/Input'
+import Button from '@/components/atoms/Button'
 
 export default function CommentForm() {
   const { id: blog_id } = useParams()

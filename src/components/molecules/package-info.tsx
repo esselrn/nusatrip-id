@@ -1,4 +1,4 @@
-import Button from '@/components/atoms/button'
+import Button from '@/components/atoms/Button'
 import Rating from '@/components/atoms/rating'
 import Location from '@/components/atoms/location'
 

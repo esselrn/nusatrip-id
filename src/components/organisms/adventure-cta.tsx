@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import { useState } from 'react'
-import Button from '@/components/atoms/button'
+import Button from '@/components/atoms/Button'
 
 export default function AdventureCTA() {
   const [showVideo, setShowVideo] = useState(false)

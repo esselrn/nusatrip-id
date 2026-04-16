@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Rating from '@/components/atoms/rating'
-import Button from '@/components/atoms/button'
+import Button from '@/components/atoms/Button'
 import type { Destination } from '@/types/destinations'
 
 type DestinationCardProps = Destination & {
