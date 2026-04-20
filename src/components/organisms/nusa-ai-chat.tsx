@@ -80,8 +80,6 @@ export default function NusaAIChat() {
     setLoading(true)
 
     try {
-      const apiKey = process.env.NEXT_PUBLIC_GROQ_API_KEY
-
       // Build history excluding initial greeting
       const history = newMessages
         .slice(1)
