@@ -61,15 +61,16 @@ const FIELDS: Partial<Record<Tab, { key: string; label: string; type?: string; r
       { key: 'thumbnail_url', label: 'URL Thumbnail' }
     ],
     blog: [
-      { key: 'title', label: 'Judul', required: true },
-      { key: 'category', label: 'Kategori' },
-      { key: 'author', label: 'Penulis' },
-      { key: 'date', label: 'Tanggal (teks)' },
-      { key: 'description', label: 'Deskripsi', textarea: true },
-      { key: 'image', label: 'URL Gambar' },
-      { key: 'hero_image', label: 'URL Hero Image' },
-      { key: 'content', label: 'Konten', textarea: true }
-    ],
+  { key: 'title', label: 'Judul', required: true },
+  { key: 'slug', label: 'Slug URL', required: true },
+  { key: 'category', label: 'Kategori', required: true },
+  { key: 'author', label: 'Penulis', required: true },
+  { key: 'date', label: 'Tanggal (teks)', required: true },
+  { key: 'description', label: 'Deskripsi', textarea: true, required: true },
+  { key: 'image', label: 'URL Gambar', required: true },
+  { key: 'hero_image', label: 'URL Hero Image' },
+  { key: 'content', label: 'Konten', textarea: true }
+],
     // Field pengguna khusus — password hanya tampil saat Tambah (bukan Edit)
     // Ini di-handle secara custom di render modal di bawah
     pengguna: [

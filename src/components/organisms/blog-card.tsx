@@ -11,13 +11,20 @@ type BlogCardProps = {
   image: string
 }
 
+const FALLBACK = '/images/placeholder-blog.jpg'
+
+function isValidSrc(src: string) {
+  return src && (src.startsWith('http://') || src.startsWith('https://') || src.startsWith('/'))
+}
+
 export default function BlogCard({ id, slug, title, category, date, description, image }: BlogCardProps) {
   const href = `/pages/blog-article/${slug ?? id}`
+  const validImage = isValidSrc(image) ? image : FALLBACK
 
   return (
     <div className="group">
       <div className="relative w-full h-[220px] rounded-2xl overflow-hidden">
-        <Image src={image} alt={title} fill className="object-cover group-hover:scale-105 transition" />
+        <Image src={validImage} alt={title} fill className="object-cover group-hover:scale-105 transition" />
         <span className="absolute bottom-4 left-4 bg-white text-[#0B2C4D] text-sm font-inter px-3 py-1 rounded-md shadow">
           {category}
         </span>
